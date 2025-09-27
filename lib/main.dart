@@ -40,11 +40,13 @@ class MyHomePage extends StatelessWidget {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
+
             Text(
               'Группа: ИКБО-11-22',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 16),
+
             Text(
               'Студенческий билет: 22И055',
               style: TextStyle(fontSize: 18),
