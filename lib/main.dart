@@ -35,6 +35,7 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
+
             Text(
               'Амерханов Кирилл Антонович',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -51,6 +52,7 @@ class MyHomePage extends StatelessWidget {
               'Студенческий билет: 22И055',
               style: TextStyle(fontSize: 18),
             ),
+
           ],
         ),
       ),
