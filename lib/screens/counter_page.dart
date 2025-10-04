@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
-import 'app_colors.dart';
+import '../app/app_state.dart';
+import '../app/app_colors.dart';
 
 class CounterPage extends StatelessWidget {
   final AppState state;

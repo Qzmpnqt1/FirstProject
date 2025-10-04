@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import '../app/app_colors.dart';
 
 class SettingsHeader extends StatelessWidget {
   const SettingsHeader({super.key});

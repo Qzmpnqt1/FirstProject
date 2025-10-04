@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
-import 'app_colors.dart';
-import 'multi_listenable_builder.dart';
-import 'profile_chip.dart';
+import '../app/app_state.dart';
+import '../app/app_colors.dart';
+import '../widgets/multi_listenable_builder.dart';
+import '../widgets/profile_chip.dart';
 
 class ProfilePage extends StatefulWidget {
   final AppState state;

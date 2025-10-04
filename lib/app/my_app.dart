@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_state.dart';
 import 'app_colors.dart';
-import 'home_screen.dart';
+import '../screens/home_screen.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});

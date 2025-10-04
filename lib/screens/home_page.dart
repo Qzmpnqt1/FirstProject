@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
-import 'app_colors.dart';
-import 'task.dart';
-import 'task_tile.dart';
+import '../app/app_state.dart';
+import '../app/app_colors.dart';
+import '../data/task.dart';
+import '../widgets/task_tile.dart';
 
 class HomePage extends StatefulWidget {
   final AppState state;

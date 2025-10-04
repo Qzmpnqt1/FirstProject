@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'app_state.dart';
-import 'app_colors.dart';
-import 'task.dart';
-import 'multi_listenable_builder.dart';
+import '../app/app_state.dart';
+import '../app/app_colors.dart';
+import '../data/task.dart';
+import '../widgets/multi_listenable_builder.dart';
 
 class AboutPage extends StatefulWidget {
   final AppState state;

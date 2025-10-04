@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show ValueNotifier;
-import 'storage.dart';
-import 'task.dart';
+import '../data/storage.dart';
+import '../data/task.dart';
 
 class AppState {
   // Тема/настройки

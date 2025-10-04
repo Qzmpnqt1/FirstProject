@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
-import 'app_colors.dart';
+import '../app/app_state.dart';
+import '../app/app_colors.dart';
 import 'home_page.dart';
 import 'profile_page.dart';
 import 'counter_page.dart';
 import 'settings_page.dart';
 import 'about_page.dart';
-import 'task.dart';
+import '../data/task.dart';
 
 class HomeScreen extends StatefulWidget {
   final AppState state;

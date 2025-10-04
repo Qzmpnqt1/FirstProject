@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
-import 'app_colors.dart';
-import 'settings_header.dart';
+import '../app/app_state.dart';
+import '../app/app_colors.dart';
+import '../widgets/settings_header.dart';
 
 class SettingsPage extends StatelessWidget {
   final AppState state;

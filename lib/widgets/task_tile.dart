@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
-import 'task.dart';
+import '../app/app_colors.dart';
+import '../data/task.dart';
 
 class TaskTile extends StatelessWidget {
   final Task task;
