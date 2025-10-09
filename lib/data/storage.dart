@@ -1,3 +1,4 @@
+// lib/data/storage.dart
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'task.dart';
@@ -12,6 +13,9 @@ class Storage {
   static const _kRole = 'profile_role';
   static const _kNotif = 'settings_notifications';
   static const _kAnalyt = 'settings_analytics';
+
+  // NEW:
+  static const _kModules = 'modules_json';
 
   static Future<void> init() async => _prefs = await SharedPreferences.getInstance();
 
@@ -46,4 +50,22 @@ class Storage {
 
   static Future<void> setTasks(List<Task> tasks) =>
       _prefs.setString(_kTasks, jsonEncode(tasks.map((e) => e.toJson()).toList()));
+
+  // --------- NEW: сохранение учебных модулей (список строк) ----------
+  static List<String> getModules() {
+    final raw = _prefs.getString(_kModules);
+    if (raw == null || raw.isEmpty) {
+      return [
+        'Введение в Flutter',
+        'Стейт-менеджмент (ValueNotifier)',
+        'Списки: Column / ListView',
+        'Работа с SharedPreferences',
+        'Практическая №3 – виджеты',
+      ];
+    }
+    return (jsonDecode(raw) as List).cast<String>();
+  }
+
+  static Future<void> setModules(List<String> modules) =>
+      _prefs.setString(_kModules, jsonEncode(modules));
 }
