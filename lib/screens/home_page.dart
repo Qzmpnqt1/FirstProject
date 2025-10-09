@@ -3,6 +3,7 @@ import '../app/app_state.dart';
 import '../app/app_colors.dart';
 import '../data/task.dart';
 import '../widgets/task_tile.dart';
+import 'lists/lists_showcase_screen.dart';
 
 class HomePage extends StatefulWidget {
   final AppState state;
@@ -21,6 +22,7 @@ class _HomePageState extends State<HomePage> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
+        // Шапка с краткой информацией и счётчиком
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -55,8 +57,29 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+
         const SizedBox(height: 16),
 
+        // NEW: переход к витрине списков (Column / ListView.builder / ListView.separated)
+        Card(
+          child: ListTile(
+            leading:
+            const Icon(Icons.view_list_rounded, color: AppColors.primary),
+            title: const Text('Витрина списков (Column / ListView)'),
+            subtitle:
+            const Text('Три подхода к спискам + добавление/удаление'),
+            trailing: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => ListsShowcaseScreen(state: widget.state),
+                ));
+              },
+              child: const Text('Открыть'),
+            ),
+          ),
+        ),
+
+        // Поиск по задачам
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -83,6 +106,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
+        // Добавление новой задачи
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -119,6 +143,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
+        // Список задач (фильтрация + очистка выполненных)
         ValueListenableBuilder<List<Task>>(
           valueListenable: widget.state.tasks,
           builder: (_, tasks, __) {
