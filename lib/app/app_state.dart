@@ -16,6 +16,9 @@ class AppState {
   final counter = ValueNotifier<int>(Storage.getCounter());
   final tasks = ValueNotifier<List<Task>>(Storage.getTasks());
 
+  // NEW: учебные модули для практики со списками
+  final modules = ValueNotifier<List<String>>(Storage.getModules());
+
   // --- операции с персистом ---
   Future<void> setDark(bool v) async { themeDark.value = v; await Storage.setDark(v); }
   Future<void> setNotifications(bool v) async { notifications.value = v; await Storage.setNotifications(v); }
@@ -52,5 +55,24 @@ class AppState {
     final list = tasks.value.where((t) => !t.done).toList();
     tasks.value = list;
     await Storage.setTasks(list);
+  }
+
+  // --------- NEW: операции с учебными модулями ----------
+  Future<void> addModule(String title) async {
+    final list = [...modules.value, title];
+    modules.value = list;
+    await Storage.setModules(list);
+  }
+
+  Future<void> deleteModuleAt(int index) async {
+    final list = [...modules.value]..removeAt(index);
+    modules.value = list;
+    await Storage.setModules(list);
+  }
+
+  Future<void> deleteModuleByTitle(String title) async {
+    final list = [...modules.value]..removeWhere((e) => e == title);
+    modules.value = list;
+    await Storage.setModules(list);
   }
 }
