@@ -101,7 +101,7 @@ class _ColumnList extends StatelessWidget {
             children: [
               for (int i = 0; i < modules.length; i++)
                 Dismissible(
-                  key: ValueKey('col_${modules[i]}_$i'), // КЛЮЧ — решает проблему «удаления не последнего»
+                  key: ValueKey('col_${modules[i]}_$i'),
                   background: _bg(Alignment.centerLeft),
                   secondaryBackground: _bg(Alignment.centerRight),
                   onDismissed: (_) => state.deleteModuleAt(i),
