@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/app_state.dart';
-import '../../app/app_colors.dart';
 import '../../data/module.dart';
+import '../../widgets/topic_row.dart'; // ← добавили
 
 class ModuleDetailsScreen extends StatelessWidget {
   final AppState state;
@@ -14,6 +14,8 @@ class ModuleDetailsScreen extends StatelessWidget {
       valueListenable: state.modulesEx,
       builder: (_, list, __) {
         final m = list.firstWhere((e) => e.id == moduleId);
+        final progressPercent = (m.progress * 100).toStringAsFixed(0);
+
         return Scaffold(
           appBar: AppBar(
             title: Text(m.title),
@@ -26,18 +28,34 @@ class ModuleDetailsScreen extends StatelessWidget {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => _addItem(context, m),
+            onPressed: () => _addItem(context),
             icon: const Icon(Icons.add),
             label: const Text('Тема/практика'),
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
             children: [
-              _header(m),
-              const SizedBox(height: 10),
-              _section('Теория', m.topics, (i, v) => state.toggleTopic(moduleId, true, i, v), (i) => state.deleteTopic(moduleId, true, i)),
-              const SizedBox(height: 8),
-              _section('Практика', m.practices, (i, v) => state.toggleTopic(moduleId, false, i, v), (i) => state.deleteTopic(moduleId, false, i)),
+              Card(
+                child: ListTile(
+                  leading: CircularProgressIndicator(value: m.progress),
+                  title: Text('Прогресс: $progressPercent%'),
+                  subtitle: Text('Тип: ${_type(m.type)} • Часы: ${m.hours} • Статус: ${_status(m.status)}'),
+                ),
+              ),
+              _section(
+                context: context,
+                title: 'Теория',
+                items: m.topics,
+                onToggle: (i, v) => state.toggleTopic(moduleId, true, i, v),
+                onDelete: (i) => state.deleteTopic(moduleId, true, i),
+              ),
+              _section(
+                context: context,
+                title: 'Практика',
+                items: m.practices,
+                onToggle: (i, v) => state.toggleTopic(moduleId, false, i, v),
+                onDelete: (i) => state.deleteTopic(moduleId, false, i),
+              ),
             ],
           ),
         );
@@ -45,32 +63,19 @@ class ModuleDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _header(Module m) {
-    final p = (m.progress * 100).toStringAsFixed(0);
-    return Card(
-      child: ListTile(
-        leading: CircularProgressIndicator(value: m.progress),
-        title: Text('Прогресс: $p%'),
-        subtitle: Text('Тип: ${_type(m.type)} • Часы: ${m.hours} • Статус: ${_status(m.status)}'),
-      ),
-    );
-  }
-
-  Widget _section(
-      String title,
-      List<TopicItem> items,
-      void Function(int index, bool value) onToggle,
-      void Function(int index) onDelete,
-      ) {
+  Widget _section({
+    required BuildContext context,
+    required String title,
+    required List<TopicItem> items,
+    required void Function(int index, bool value) onToggle,
+    required void Function(int index) onDelete,
+  }) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
-            ListTile(
-              leading: const Icon(Icons.list_alt_rounded, color: AppColors.primary),
-              title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700)),
-            ),
+            ListTile(title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700))),
             const Divider(height: 1),
             if (items.isEmpty)
               const Padding(
@@ -78,15 +83,11 @@ class ModuleDetailsScreen extends StatelessWidget {
                 child: Text('Пока пусто'),
               ),
             for (int i = 0; i < items.length; i++)
-              CheckboxListTile(
-                value: items[i].done,
-                onChanged: (v) => onToggle(i, v ?? false),
-                title: Text(items[i].title),
-                secondary: IconButton(
-                  tooltip: 'Удалить',
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => onDelete(i),
-                ),
+              TopicRow(
+                key: ValueKey('${title}_$i'),
+                item: items[i],
+                onToggle: (v) => onToggle(i, v),
+                onDelete: () => onDelete(i),
               ),
           ],
         ),
@@ -104,7 +105,10 @@ class ModuleDetailsScreen extends StatelessWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           ElevatedButton(
-            onPressed: () { if (c.text.trim().isNotEmpty) state.renameModule(m.id, c.text.trim()); Navigator.pop(context); },
+            onPressed: () {
+              if (c.text.trim().isNotEmpty) state.renameModule(m.id, c.text.trim());
+              Navigator.pop(context);
+            },
             child: const Text('Сохранить'),
           ),
         ],
@@ -112,7 +116,7 @@ class ModuleDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _addItem(BuildContext context, Module m) {
+  void _addItem(BuildContext context) {
     final c = TextEditingController();
     bool isTopic = true;
     showDialog(
@@ -140,6 +144,7 @@ class ModuleDetailsScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               if (c.text.trim().isEmpty) return;
+              // Делегируем контейнеру состояния
               state.addTopic(moduleId, isTopic, c.text.trim());
               Navigator.pop(context);
             },
