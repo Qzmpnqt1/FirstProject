@@ -7,6 +7,8 @@ import 'counter_page.dart';
 import 'settings_page.dart';
 import 'about_page.dart';
 import '../data/task.dart';
+import '../data/auth_user.dart'; // добавлено
+import 'modules/modules_screen.dart'; // добавлено
 
 class HomeScreen extends StatefulWidget {
   final AppState state;
@@ -21,9 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _titleFor(int i) => switch (i) {
     0 => 'Главная',
-    1 => 'Профиль',
-    2 => 'Счётчик',
-    3 => 'Настройки',
+    1 => 'Модули',
+    2 => 'Профиль',
+    3 => 'Счётчик',
+    4 => 'Настройки',
     _ => 'О приложении',
   };
 
@@ -31,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final pages = [
       HomePage(state: widget.state),
+      ModulesScreen(state: widget.state), // новая страница
       ProfilePage(state: widget.state),
       CounterPage(state: widget.state),
       SettingsPage(state: widget.state),
@@ -41,6 +45,20 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(_titleFor(_index)),
         actions: [
+          // показ текущего пользователя
+          ValueListenableBuilder<AuthUser?>(
+            valueListenable: widget.state.user,
+            builder: (_, u, __) => u == null
+                ? const SizedBox.shrink()
+                : Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Chip(
+                label: Text(u.fullName),
+                backgroundColor: AppColors.accentSoft,
+              ),
+            ),
+          ),
+          // статистика задач
           ValueListenableBuilder<List<Task>>(
             valueListenable: widget.state.tasks,
             builder: (_, tasks, __) {
@@ -73,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (i) => setState(() => _index = i),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: "Главная"),
+          BottomNavigationBarItem(icon: Icon(Icons.school_rounded), label: "Модули"),
           BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: "Профиль"),
           BottomNavigationBarItem(icon: Icon(Icons.add_circle_rounded), label: "Счётчик"),
           BottomNavigationBarItem(icon: Icon(Icons.settings_rounded), label: "Настройки"),

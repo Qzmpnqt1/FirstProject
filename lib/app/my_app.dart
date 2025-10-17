@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_state.dart';
 import 'app_colors.dart';
-import '../screens/home_screen.dart';
+import 'auth_gate.dart'; // добавлено
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp> {
       theme: light,
       darkTheme: dark,
       themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      home: HomeScreen(state: state),
+      home: AuthGate(state: state), // вместо HomeScreen
     );
   }
 }

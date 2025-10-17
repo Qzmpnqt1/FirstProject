@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'task.dart';
+import 'auth_user.dart';
+import 'module.dart';
 
 class Storage {
   static late SharedPreferences _prefs;
@@ -13,8 +15,15 @@ class Storage {
   static const _kNotif = 'settings_notifications';
   static const _kAnalyt = 'settings_analytics';
 
-  // NEW:
+  // Старые модули (строки)
   static const _kModules = 'modules_json';
+  // Новые модули (сущности)
+  static const _kModulesEx = 'modules_ex_json';
+
+  // Auth
+  static const _kUsersIndex = 'auth_users_index_json'; // список зарегистрированных пользователей
+  static const _kCurrentUser = 'auth_current_user_json'; // текущий пользователь
+  static const _kPasswords = 'auth_passwords_json'; // email -> пароль (учебно)
 
   static Future<void> init() async => _prefs = await SharedPreferences.getInstance();
 
@@ -50,7 +59,7 @@ class Storage {
   static Future<void> setTasks(List<Task> tasks) =>
       _prefs.setString(_kTasks, jsonEncode(tasks.map((e) => e.toJson()).toList()));
 
-  // --------- NEW: сохранение учебных модулей (список строк) ----------
+  // --------- СТАРОЕ: список строк ----------
   static List<String> getModules() {
     final raw = _prefs.getString(_kModules);
     if (raw == null || raw.isEmpty) {
@@ -67,4 +76,125 @@ class Storage {
 
   static Future<void> setModules(List<String> modules) =>
       _prefs.setString(_kModules, jsonEncode(modules));
+
+  // --------- НОВОЕ: сущности модулей ----------
+  static List<Module> getModulesEx() {
+    final raw = _prefs.getString(_kModulesEx);
+    if (raw != null && raw.isNotEmpty) {
+      final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+      return list.map(Module.fromJson).toList();
+    }
+    // Миграция из старого формата (строки)
+    final legacy = getModules();
+    if (legacy.isNotEmpty) {
+      final seeded = legacy.asMap().entries.map((e) {
+        return Module(
+          id: 'legacy_${e.key}',
+          title: e.value,
+          type: ModuleType.lecture,
+          hours: 2,
+          status: ModuleStatus.notStarted,
+          topics: [TopicItem('Обзор материала "${e.value}"')],
+          practices: [TopicItem('Мини-практика по "${e.value}"')],
+        );
+      }).toList();
+      setModulesEx(seeded);
+      return seeded;
+    }
+    // Значения по умолчанию
+    final defaults = [
+      Module(
+        id: 'm1',
+        title: 'Основы Flutter и структура проекта',
+        type: ModuleType.lecture,
+        hours: 4,
+        status: ModuleStatus.notStarted,
+        topics: const [TopicItem('Widget tree'), TopicItem('MaterialApp/Theme'), TopicItem('Навигация')],
+        practices: const [TopicItem('Собрать экран профиля')],
+      ),
+      Module(
+        id: 'm2',
+        title: 'Списки и работа с состоянием',
+        type: ModuleType.practice,
+        hours: 4,
+        status: ModuleStatus.notStarted,
+        topics: const [TopicItem('ValueNotifier/ValueListenableBuilder')],
+        practices: const [TopicItem('CRUD для модулей'), TopicItem('Dismissible карточки')],
+      ),
+      Module(
+        id: 'm3',
+        title: 'Персистентность: SharedPreferences',
+        type: ModuleType.lab,
+        hours: 3,
+        status: ModuleStatus.notStarted,
+        topics: const [TopicItem('Ключи и схемы хранения')],
+        practices: const [TopicItem('Сохранение прогресса и профиля')],
+      ),
+    ];
+    setModulesEx(defaults);
+    return defaults;
+  }
+
+  static Future<void> setModulesEx(List<Module> modules) =>
+      _prefs.setString(_kModulesEx, jsonEncode(modules.map((e) => e.toJson()).toList()));
+
+  // --------- Auth ----------
+  static AuthUser? getCurrentUser() {
+    final raw = _prefs.getString(_kCurrentUser);
+    if (raw == null || raw.isEmpty) return null;
+    return AuthUser.fromJson(jsonDecode(raw));
+  }
+
+  static Future<void> _setCurrentUser(AuthUser? u) async {
+    if (u == null) {
+      await _prefs.remove(_kCurrentUser);
+    } else {
+      await _prefs.setString(_kCurrentUser, jsonEncode(u.toJson()));
+    }
+  }
+
+  static Map<String, String> _getPasswords() {
+    final raw = _prefs.getString(_kPasswords);
+    if (raw == null || raw.isEmpty) return {};
+    return (jsonDecode(raw) as Map).map((k, v) => MapEntry(k as String, v as String));
+  }
+
+  static Future<void> _setPasswords(Map<String, String> map) =>
+      _prefs.setString(_kPasswords, jsonEncode(map));
+
+  static List<AuthUser> _getUsersIndex() {
+    final raw = _prefs.getString(_kUsersIndex);
+    if (raw == null || raw.isEmpty) return [];
+    final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+    return list.map((e) => AuthUser.fromJson(e)).toList();
+  }
+
+  static Future<void> _setUsersIndex(List<AuthUser> users) =>
+      _prefs.setString(_kUsersIndex, jsonEncode(users.map((e) => e.toJson()).toList()));
+
+  static Future<bool> register(String fullName, String email, String password) async {
+    final users = _getUsersIndex();
+    if (users.any((u) => u.email.toLowerCase() == email.toLowerCase())) return false;
+    final u = AuthUser(email: email, fullName: fullName.isEmpty ? email : fullName);
+    users.add(u);
+    await _setUsersIndex(users);
+    final pw = _getPasswords();
+    pw[email.toLowerCase()] = password; // учебно: без хэширования
+    await _setPasswords(pw);
+    return true;
+  }
+
+  static Future<AuthUser?> login(String email, String password) async {
+    final pw = _getPasswords();
+    final ok = pw[email.toLowerCase()] == password;
+    if (!ok) return null;
+    final u = _getUsersIndex().firstWhere(
+          (x) => x.email.toLowerCase() == email.toLowerCase(),
+      orElse: () => AuthUser(email: email, fullName: email),
+    );
+    await _setCurrentUser(u);
+    return u;
+  }
+
+  static Future<void> logout() => _setCurrentUser(null);
 }

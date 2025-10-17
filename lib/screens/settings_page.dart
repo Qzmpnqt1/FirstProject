@@ -21,8 +21,7 @@ class SettingsPage extends StatelessWidget {
               onChanged: (v) => state.setDark(v),
               title: const Text('Тёмная тема'),
               subtitle: const Text('Переключение ThemeMode для всего приложения'),
-              secondary:
-              const Icon(Icons.dark_mode_rounded, color: AppColors.primary),
+              secondary: const Icon(Icons.dark_mode_rounded, color: AppColors.primary),
             ),
           ),
         ),
@@ -52,6 +51,18 @@ class SettingsPage extends StatelessWidget {
                   child: const Text('Сброс'),
                 ),
               ],
+            ),
+          ),
+        ),
+        // === новый блок: выход из аккаунта ===
+        Card(
+          child: ListTile(
+            leading: const Icon(Icons.logout_rounded, color: AppColors.primary),
+            title: const Text('Выйти из аккаунта'),
+            subtitle: const Text('Завершить текущую сессию'),
+            trailing: ElevatedButton(
+              onPressed: state.logout,
+              child: const Text('Выйти'),
             ),
           ),
         ),
