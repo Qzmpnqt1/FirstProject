@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/app_state.dart';
 import '../../data/module.dart';
-import '../../app/app_colors.dart';
-import '../../widgets/modules_list_view.dart'; // ← добавили
+import '../../widgets/modules_list_view.dart';
 import 'module_details_screen.dart';
 
 class ModulesScreen extends StatelessWidget {

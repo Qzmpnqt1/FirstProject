@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/app_state.dart';
 import '../../data/module.dart';
-import '../../widgets/topic_row.dart'; // ← добавили
+import '../../widgets/topic_row.dart';
 
 class ModuleDetailsScreen extends StatelessWidget {
   final AppState state;
