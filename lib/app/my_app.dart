@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_state.dart';
 import 'app_colors.dart';
-import 'auth_gate.dart'; // добавлено
+import '../screens/home_screen.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -85,11 +85,11 @@ class _MyAppState extends State<MyApp> {
     );
 
     return MaterialApp(
-      title: 'Практическая работа №3. Амерханов К.А. ИКБО-11-22',
+      title: 'Практическая работа №6. Амерханов К.А. ИКБО-11-22',
       theme: light,
       darkTheme: dark,
       themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      home: AuthGate(state: state), // вместо HomeScreen
+      home: HomeScreen(state: state),
     );
   }
 }

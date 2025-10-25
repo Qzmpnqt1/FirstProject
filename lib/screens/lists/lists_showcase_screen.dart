@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../app/app_state.dart';
 import '../../app/app_colors.dart';
 
@@ -13,6 +14,20 @@ class ListsShowcaseScreen extends StatefulWidget {
 class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTickerProviderStateMixin {
   late final TabController _tab = TabController(length: 3, vsync: this);
   final input = TextEditingController();
+
+  // Плоская иконка «книги»
+  static const _modulesUrl =
+      'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4da.png';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await precacheImage(CachedNetworkImageProvider(_modulesUrl), context);
+      } catch (_) {}
+    });
+  }
 
   @override
   void dispose() {
@@ -41,6 +56,24 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
             Tab(text: 'ListView.separated'),
           ],
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: CachedNetworkImage(
+                  imageUrl: _modulesUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (_, __) => Container(color: Color(0xFFE2E8F0)),
+                  errorWidget: (_, __, ___) => const Icon(Icons.menu_book_rounded),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -85,11 +118,10 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
   }
 }
 
-// ------------- 1) Column + SingleChildScrollView -------------
+// ----- остальной код списков (без изменений) -----
 class _ColumnList extends StatelessWidget {
   final AppState state;
   const _ColumnList({required this.state});
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<String>>(
@@ -128,7 +160,6 @@ class _ColumnList extends StatelessWidget {
       },
     );
   }
-
   Widget _bg(Alignment a) => Container(
     decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
     alignment: a,
@@ -137,11 +168,9 @@ class _ColumnList extends StatelessWidget {
   );
 }
 
-// ------------- 2) ListView.builder -------------
 class _BuilderList extends StatelessWidget {
   final AppState state;
   const _BuilderList({required this.state});
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<String>>(
@@ -174,7 +203,6 @@ class _BuilderList extends StatelessWidget {
       },
     );
   }
-
   Widget _bg(Alignment a) => Container(
     decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
     alignment: a,
@@ -183,11 +211,9 @@ class _BuilderList extends StatelessWidget {
   );
 }
 
-// ------------- 3) ListView.separated -------------
 class _SeparatedList extends StatelessWidget {
   final AppState state;
   const _SeparatedList({required this.state});
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<String>>(
@@ -222,7 +248,6 @@ class _SeparatedList extends StatelessWidget {
       },
     );
   }
-
   Widget _bg(Alignment a) => Container(
     decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
     alignment: a,

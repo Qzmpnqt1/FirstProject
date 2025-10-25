@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../app/app_state.dart';
 import '../app/app_colors.dart';
 import '../data/task.dart';
@@ -17,6 +18,20 @@ class _AboutPageState extends State<AboutPage> {
   static const String _version = '1.0.0';
   int _taps = 0;
 
+  // Плоская иконка страницы
+  static const _aboutUrl =
+      'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4c4.png';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await precacheImage(CachedNetworkImageProvider(_aboutUrl), context);
+      } catch (_) {}
+    });
+  }
+
   void _copyVersion() async {
     await Clipboard.setData(const ClipboardData(text: _version));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -32,8 +47,7 @@ class _AboutPageState extends State<AboutPage> {
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('🎉 Пасхалка'),
-          content:
-          const Text('Молодец! Ты нашёл пасхалку. Удачи на защите!'),
+          content: const Text('Молодец! Ты нашёл пасхалку. Удачи на защите!'),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -51,10 +65,25 @@ class _AboutPageState extends State<AboutPage> {
       children: [
         Card(
           child: ListTile(
-            leading: const Icon(Icons.apps_rounded, color: AppColors.primary),
+            // (4) Плоская иконка «страница»
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: CachedNetworkImage(
+                  imageUrl: _aboutUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (_, __) => Container(color: Color(0xFFE2E8F0)),
+                  errorWidget: (_, __, ___) =>
+                  const Icon(Icons.apps_rounded, color: AppColors.primary),
+                ),
+              ),
+            ),
             title: const Text('Практическая работа №3'),
             subtitle: const Text(
                 'Демонстрация Stateless/Stateful виджетов и смены контента'),
+            onTap: _easterEggTap,
           ),
         ),
         Card(
@@ -100,7 +129,6 @@ class _AboutPageState extends State<AboutPage> {
             const Icon(Icons.info_outline_rounded, color: AppColors.primary),
             title: const Text('Версия'),
             subtitle: Text(_version),
-            onTap: _easterEggTap,
             trailing: OutlinedButton(
               onPressed: _copyVersion,
               child: const Text('Скопировать'),
