@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../app/app_state.dart';
 import '../../data/module.dart';
 import '../../widgets/modules_list_view.dart';
-import 'module_details_screen.dart';
 
 class ModulesScreen extends StatelessWidget {
   final AppState state;
@@ -21,11 +21,7 @@ class ModulesScreen extends StatelessWidget {
         builder: (_, list, __) {
           return ModulesListView(
             modules: list,
-            onOpen: (m) => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ModuleDetailsScreen(state: state, moduleId: m.id),
-              ),
-            ),
+            onOpen: (m) => context.pushNamed('module_details', pathParameters: {'id': m.id}),
             onDelete: (m) => state.deleteModuleEx(m.id),
           );
         },

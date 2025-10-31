@@ -1,17 +1,20 @@
-// lib/app/my_app.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'app_state.dart';
 import 'app_colors.dart';
-import '../screens/main_tabs_page.dart';
+import 'app_router.dart';
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class MyAppGoRouter extends StatefulWidget {
+  const MyAppGoRouter({super.key});
+
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MyAppGoRouter> createState() => _MyAppGoRouterState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppGoRouterState extends State<MyAppGoRouter> {
   final AppState state = AppState();
+  late final AppRouter _appRouter = AppRouter(state);
+  late final GoRouter _router = _appRouter.router;
 
   @override
   void initState() {
@@ -32,29 +35,14 @@ class _MyAppState extends State<MyApp> {
       scaffoldBackgroundColor: AppColors.surface,
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.primary,
-        elevation: 2,
         foregroundColor: Colors.white,
         centerTitle: true,
-        titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: AppColors.textPrimary,
-          elevation: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
       ),
       cardTheme: const CardThemeData(
         color: Colors.white,
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
         margin: EdgeInsets.all(16),
-      ),
-      textTheme: const TextTheme(
-        bodyMedium: TextStyle(color: AppColors.textSecondary, fontSize: 16),
-        titleLarge: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
       ),
     );
 
@@ -68,13 +56,12 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
-    return MaterialApp(
-      title: 'Практическая работа №7 — страничная навигация',
+    return MaterialApp.router(
+      title: 'Практическая №7 — маршрутная навигация (go_router)',
       theme: light,
       darkTheme: dark,
       themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      // Горизонтальная навигация — корневой TabBarView
-      home: MainTabsPage(state: state),
+      routerConfig: _router, // <-- всё, больше ничего не нужно
     );
   }
 }

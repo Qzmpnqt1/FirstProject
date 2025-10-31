@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../app/app_state.dart';
 import '../../app/app_colors.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final AppState state;
@@ -24,13 +24,16 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Неверный email или пароль')),
       );
+      return;
     }
+    if (mounted) context.go('/'); // редирект на корень табов
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
+      appBar: AppBar(title: const Text('Вход')),
       body: Center(
         child: Card(
           child: Padding(
@@ -40,8 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Вход', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 12),
                   TextField(
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
@@ -64,11 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => RegisterScreen(state: widget.state)),
-                      );
-                    },
+                    onPressed: () => context.pushNamed('register'),
                     child: const Text('Нет аккаунта? Зарегистрироваться'),
                   ),
                 ],
