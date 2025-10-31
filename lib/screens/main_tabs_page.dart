@@ -1,4 +1,3 @@
-// lib/screens/main_tabs_page.dart
 import 'package:flutter/material.dart';
 import '../app/app_colors.dart';
 import '../app/app_state.dart';
@@ -40,20 +39,10 @@ class _MainTabsPageState extends State<MainTabsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // только заголовок, БЕЗ TabBar
         title: AnimatedBuilder(
           animation: _tab,
           builder: (_, __) => Text(_titleFor(_tab.index)),
-        ),
-        bottom: const TabBar(
-          tabs: [
-            Tab(icon: Icon(Icons.home_rounded), text: 'Главная'),
-            Tab(icon: Icon(Icons.school_rounded), text: 'Модули'),
-            Tab(icon: Icon(Icons.person_rounded), text: 'Профиль'),
-            Tab(icon: Icon(Icons.add_circle_rounded), text: 'Счётчик'),
-            Tab(icon: Icon(Icons.settings_rounded), text: 'Настройки'),
-          ],
-          isScrollable: false,
-          // Никакой кнопки "назад" тут нет — это горизонтальная навигация
         ),
       ),
       body: DecoratedBox(
@@ -76,6 +65,7 @@ class _MainTabsPageState extends State<MainTabsPage>
           ],
         ),
       ),
+      // единственная горизонтальная навигация — снизу
       bottomNavigationBar: Material(
         color: AppColors.navBg,
         child: SafeArea(
