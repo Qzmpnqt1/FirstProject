@@ -57,11 +57,11 @@ class _MyAppGoRouterState extends State<MyAppGoRouter> {
     );
 
     return MaterialApp.router(
-      title: 'Практическая №7 — маршрутная навигация (go_router)',
+      title: 'Практическая №7 — go_router везде',
       theme: light,
       darkTheme: dark,
       themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      routerConfig: _router, // <-- всё, больше ничего не нужно
+      routerConfig: _router,
     );
   }
 }
