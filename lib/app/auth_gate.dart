@@ -16,7 +16,7 @@ class AuthGate extends StatelessWidget {
         if (u == null) {
           return LoginScreen(state: state);
         }
-        return HomeScreen(state: state);
+        return HomeScreen(state: state, current: TopPage.home);
       },
     );
   }

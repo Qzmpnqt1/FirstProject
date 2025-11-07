@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'app_state.dart';
 import 'app_colors.dart';
-import '../screens/home_screen.dart';
+import 'app_state.dart';
+import 'routes.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -36,15 +36,6 @@ class _MyAppState extends State<MyApp> {
         centerTitle: true,
         titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: AppColors.navBg,
-        selectedItemColor: AppColors.accent,
-        unselectedItemColor: AppColors.navUnselected,
-        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w600),
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        elevation: 8,
-      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.accent,
@@ -69,14 +60,6 @@ class _MyAppState extends State<MyApp> {
     final dark = ThemeData(
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary, brightness: Brightness.dark),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF0E1A18),
-        selectedItemColor: AppColors.accent,
-        unselectedItemColor: AppColors.navUnselected,
-        showUnselectedLabels: true,
-        type: BottomNavigationBarType.fixed,
-        elevation: 8,
-      ),
       cardTheme: const CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
@@ -85,11 +68,13 @@ class _MyAppState extends State<MyApp> {
     );
 
     return MaterialApp(
-      title: 'Практическая работа №6. Амерханов К.А. ИКБО-11-22',
+      title: 'Практическая работа №7. Амерханов К.А. ИКБО-11-22',
       theme: light,
       darkTheme: dark,
       themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      home: HomeScreen(state: state),
+      // Полная страничная навигация
+      initialRoute: state.user.value == null ? AppRoutes.login : AppRoutes.home,
+      onGenerateRoute: (settings) => buildRoute(settings, state),
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../app/app_state.dart';
 import '../../app/app_colors.dart';
-import 'register_screen.dart';
+import '../../app/routes.dart';
 
 class LoginScreen extends StatefulWidget {
   final AppState state;
@@ -24,6 +24,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Неверный email или пароль')),
       );
+    } else if (mounted) {
+      // После входа — страничная навигация на верхний уровень
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
     }
   }
 
@@ -64,11 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => RegisterScreen(state: widget.state)),
-                      );
-                    },
+                    onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
                     child: const Text('Нет аккаунта? Зарегистрироваться'),
                   ),
                 ],

@@ -1,53 +1,53 @@
 import 'package:flutter/material.dart';
-import '../app/app_state.dart';
 import '../app/app_colors.dart';
+import '../app/app_state.dart';
+import '../app/routes.dart';
+import '../data/task.dart';
+import '../data/auth_user.dart';
+
 import 'home_page.dart';
+import 'modules/modules_screen.dart';
 import 'profile_page.dart';
 import 'counter_page.dart';
 import 'settings_page.dart';
 import 'about_page.dart';
-import '../data/task.dart';
-import '../data/auth_user.dart'; // добавлено
-import 'modules/modules_screen.dart'; // добавлено
 
-class HomeScreen extends StatefulWidget {
+enum TopPage { home, modules, profile, counter, settings, about }
+
+class HomeScreen extends StatelessWidget {
   final AppState state;
-  const HomeScreen({super.key, required this.state});
+  final TopPage current;
+  const HomeScreen({super.key, required this.state, required this.current});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+  String get _title => switch (current) {
+    TopPage.home => 'Главная',
+    TopPage.modules => 'Модули',
+    TopPage.profile => 'Профиль',
+    TopPage.counter => 'Счётчик',
+    TopPage.settings => 'Настройки',
+    TopPage.about => 'О приложении',
+  };
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _index = 0;
-
-  String _titleFor(int i) => switch (i) {
-    0 => 'Главная',
-    1 => 'Модули',
-    2 => 'Профиль',
-    3 => 'Счётчик',
-    4 => 'Настройки',
-    _ => 'О приложении',
+  Widget _page() => switch (current) {
+    TopPage.home => HomePage(state: state),
+    TopPage.modules => ModulesScreen(state: state),
+    TopPage.profile => ProfilePage(state: state),
+    TopPage.counter => CounterPage(state: state),
+    TopPage.settings => SettingsPage(state: state),
+    TopPage.about => AboutPage(state: state),
   };
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      HomePage(state: widget.state),
-      ModulesScreen(state: widget.state), // новая страница
-      ProfilePage(state: widget.state),
-      CounterPage(state: widget.state),
-      SettingsPage(state: widget.state),
-      AboutPage(state: widget.state),
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titleFor(_index)),
+        // ВАЖНО: на верхнем уровне не показываем «Назад»
+        automaticallyImplyLeading: false,
+        title: Text(_title),
         actions: [
-          // показ текущего пользователя
+          // Текущий пользователь
           ValueListenableBuilder<AuthUser?>(
-            valueListenable: widget.state.user,
+            valueListenable: state.user,
             builder: (_, u, __) => u == null
                 ? const SizedBox.shrink()
                 : Padding(
@@ -58,9 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // статистика задач
+          // Статистика задач
           ValueListenableBuilder<List<Task>>(
-            valueListenable: widget.state.tasks,
+            valueListenable: state.tasks,
             builder: (_, tasks, __) {
               final done = tasks.where((t) => t.done).length;
               return Padding(
@@ -72,6 +72,19 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          // Меню для горизонтальной навигации (pushReplacementNamed)
+          PopupMenuButton<TopPage>(
+            onSelected: (p) => _go(context, p),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: TopPage.home, child: Text('Главная')),
+              PopupMenuItem(value: TopPage.modules, child: Text('Модули')),
+              PopupMenuItem(value: TopPage.profile, child: Text('Профиль')),
+              PopupMenuItem(value: TopPage.counter, child: Text('Счётчик')),
+              PopupMenuItem(value: TopPage.settings, child: Text('Настройки')),
+              PopupMenuItem(value: TopPage.about, child: Text('О приложении')),
+            ],
+            icon: const Icon(Icons.menu_rounded),
+          ),
         ],
       ),
       body: DecoratedBox(
@@ -82,22 +95,21 @@ class _HomeScreenState extends State<HomeScreen> {
             colors: [Color(0xFFE6FFFB), Color(0xFFF8FAFC)],
           ),
         ),
-        child: SafeArea(
-          child: IndexedStack(index: _index, children: pages),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: "Главная"),
-          BottomNavigationBarItem(icon: Icon(Icons.school_rounded), label: "Модули"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: "Профиль"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_rounded), label: "Счётчик"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_rounded), label: "Настройки"),
-          BottomNavigationBarItem(icon: Icon(Icons.info_rounded), label: "О приложении"),
-        ],
+        child: SafeArea(child: _page()),
       ),
     );
+  }
+
+  void _go(BuildContext context, TopPage page) {
+    if (page == current) return;
+    final routeName = switch (page) {
+      TopPage.home => AppRoutes.home,
+      TopPage.modules => AppRoutes.modules,
+      TopPage.profile => AppRoutes.profile,
+      TopPage.counter => AppRoutes.counter,
+      TopPage.settings => AppRoutes.settings,
+      TopPage.about => AppRoutes.about,
+    };
+    Navigator.pushReplacementNamed(context, routeName);
   }
 }

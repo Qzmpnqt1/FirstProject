@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../app/app_state.dart';
+import '../../app/routes.dart';
 import '../../data/module.dart';
 import '../../widgets/modules_list_view.dart';
-import 'module_details_screen.dart';
 
 class ModulesScreen extends StatelessWidget {
   final AppState state;
@@ -11,7 +11,10 @@ class ModulesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Учебные модули')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false, // ← убрать «Назад» на верхнем уровне
+        title: const Text('Учебные модули'),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _createModuleDialog(context),
         child: const Icon(Icons.add),
@@ -21,10 +24,11 @@ class ModulesScreen extends StatelessWidget {
         builder: (_, list, __) {
           return ModulesListView(
             modules: list,
-            onOpen: (m) => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ModuleDetailsScreen(state: state, moduleId: m.id),
-              ),
+            // Вложенная навигация — здесь «Назад» появится на экране деталей
+            onOpen: (m) => Navigator.pushNamed(
+              context,
+              AppRoutes.moduleDetails,
+              arguments: {'moduleId': m.id},
             ),
             onDelete: (m) => state.deleteModuleEx(m.id),
           );
