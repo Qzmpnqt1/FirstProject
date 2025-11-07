@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../app/app_state.dart';
 import '../app/app_colors.dart';
 import '../data/task.dart';
 import '../widgets/task_tile.dart';
-import 'lists/lists_showcase_screen.dart';
 
 class HomePage extends StatefulWidget {
   final AppState state;
@@ -18,7 +18,6 @@ class _HomePageState extends State<HomePage> {
   final input = TextEditingController();
   final search = TextEditingController();
 
-  // Плоская иконка ноутбука (Twemoji, PNG)
   static const _homeBannerUrl =
       'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4bb.png';
 
@@ -37,7 +36,6 @@ class _HomePageState extends State<HomePage> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
-        // Шапка
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -67,15 +65,13 @@ class _HomePageState extends State<HomePage> {
                   ValueListenableBuilder<int>(
                     valueListenable: widget.state.counter,
                     builder: (_, v, __) => Chip(
-                      label: Text('Счётчик: $v',
-                          style: const TextStyle(color: Colors.white)),
+                      label: Text('Счётчик: $v', style: const TextStyle(color: Colors.white)),
                       backgroundColor: Colors.black26,
                     ),
                   )
                 ],
               ),
               const SizedBox(height: 8),
-              // (1) Мини-баннер — «ноутбук/код»
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: SizedBox(
@@ -99,24 +95,18 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 16),
 
-        // Списки витрина (как было)
         Card(
           child: ListTile(
             leading: const Icon(Icons.view_list_rounded, color: AppColors.primary),
             title: const Text('Витрина списков (Column / ListView)'),
             subtitle: const Text('Три подхода к спискам + добавление/удаление'),
             trailing: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => ListsShowcaseScreen(state: widget.state),
-                ));
-              },
+              onPressed: () => context.push('/lists'),
               child: const Text('Открыть'),
             ),
           ),
         ),
 
-        // Поиск
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -128,10 +118,7 @@ class _HomePageState extends State<HomePage> {
                 suffixIcon: ValueListenableBuilder<TextEditingValue>(
                   valueListenable: search,
                   builder: (_, val, __) => val.text.isNotEmpty
-                      ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () => search.clear(),
-                  )
+                      ? IconButton(icon: const Icon(Icons.clear), onPressed: () => search.clear())
                       : const SizedBox.shrink(),
                 ),
                 border: const OutlineInputBorder(
@@ -143,7 +130,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // Добавление
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -180,7 +166,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // Список задач
         ValueListenableBuilder<List<Task>>(
           valueListenable: widget.state.tasks,
           builder: (_, tasks, __) {

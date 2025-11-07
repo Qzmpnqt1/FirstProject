@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 import 'app_state.dart';
-import 'routes.dart';
+import 'app_colors.dart';
+import 'app_router.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -11,6 +11,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final AppState state = AppState();
+  late final AppRouter _router = AppRouter(state);
 
   @override
   void initState() {
@@ -53,7 +54,7 @@ class _MyAppState extends State<MyApp> {
       ),
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: AppColors.textSecondary, fontSize: 16),
-        titleLarge: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+        titleLarge: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 22),
       ),
     );
 
@@ -67,14 +68,12 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
-    return MaterialApp(
-      title: 'Практическая работа №7. Амерханов К.А. ИКБО-11-22',
+    return MaterialApp.router(
+      title: 'Практическая №7 (Маршруты). Амерханов К.А. ИКБО-11-22',
       theme: light,
       darkTheme: dark,
       themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      // Полная страничная навигация
-      initialRoute: state.user.value == null ? AppRoutes.login : AppRoutes.home,
-      onGenerateRoute: (settings) => buildRoute(settings, state),
+      routerConfig: _router.router,
     );
   }
 }

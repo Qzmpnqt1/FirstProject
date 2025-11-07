@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../app/app_state.dart';
 import '../../app/app_colors.dart';
-import '../../app/routes.dart';
 
 class LoginScreen extends StatefulWidget {
   final AppState state;
@@ -25,8 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const SnackBar(content: Text('Неверный email или пароль')),
       );
     } else if (mounted) {
-      // После входа — страничная навигация на верхний уровень
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      context.pushReplacement('/home');
     }
   }
 
@@ -67,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
+                    onPressed: () => context.push('/login/register'),
                     child: const Text('Нет аккаунта? Зарегистрироваться'),
                   ),
                 ],

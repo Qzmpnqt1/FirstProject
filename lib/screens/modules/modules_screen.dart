@@ -1,43 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../app/app_state.dart';
-import '../../app/routes.dart';
 import '../../data/module.dart';
 import '../../widgets/modules_list_view.dart';
 
-class ModulesScreen extends StatelessWidget {
+/// Body-версия экрана списка модулей (без собственного AppBar/Scaffold),
+/// чтобы её можно было вставлять внутрь общего MainScaffold.
+class ModulesScreenBody extends StatelessWidget {
   final AppState state;
-  const ModulesScreen({super.key, required this.state});
+  const ModulesScreenBody({super.key, required this.state});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // ← убрать «Назад» на верхнем уровне
-        title: const Text('Учебные модули'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _createModuleDialog(context),
-        child: const Icon(Icons.add),
-      ),
-      body: ValueListenableBuilder<List<Module>>(
-        valueListenable: state.modulesEx,
-        builder: (_, list, __) {
-          return ModulesListView(
-            modules: list,
-            // Вложенная навигация — здесь «Назад» появится на экране деталей
-            onOpen: (m) => Navigator.pushNamed(
-              context,
-              AppRoutes.moduleDetails,
-              arguments: {'moduleId': m.id},
-            ),
-            onDelete: (m) => state.deleteModuleEx(m.id),
-          );
-        },
-      ),
-    );
-  }
-
-  void _createModuleDialog(BuildContext context) {
+  void _openCreateDialog(BuildContext context) {
     final title = TextEditingController();
     final hours = TextEditingController(text: '4');
     ModuleType type = ModuleType.lecture;
@@ -82,6 +55,33 @@ class ModulesScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ValueListenableBuilder<List<Module>>(
+          valueListenable: state.modulesEx,
+          builder: (_, list, __) {
+            return ModulesListView(
+              modules: list,
+              onOpen: (m) => context.push('/modules/${m.id}'),
+              onDelete: (m) => state.deleteModuleEx(m.id),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
+            );
+          },
+        ),
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: FloatingActionButton(
+            onPressed: () => _openCreateDialog(context),
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ],
     );
   }
 }

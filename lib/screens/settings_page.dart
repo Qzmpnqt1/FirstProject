@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../app/app_state.dart';
 import '../app/app_colors.dart';
 import '../widgets/settings_header.dart';
@@ -54,14 +55,16 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
         ),
-        // === новый блок: выход из аккаунта ===
         Card(
           child: ListTile(
             leading: const Icon(Icons.logout_rounded, color: AppColors.primary),
             title: const Text('Выйти из аккаунта'),
             subtitle: const Text('Завершить текущую сессию'),
             trailing: ElevatedButton(
-              onPressed: state.logout,
+              onPressed: () async {
+                await state.logout();
+                if (context.mounted) context.pushReplacement('/login');
+              },
               child: const Text('Выйти'),
             ),
           ),

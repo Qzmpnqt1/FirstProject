@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../app/app_state.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -35,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final ok = await widget.state.register(fullName.text.trim(), em, pw);
     setState(() => loading = false);
     if (ok && mounted) {
-      Navigator.pop(context);
+      context.pop(); // назад на /login
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация выполнена, войдите')));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Этот email уже зарегистрирован')));
