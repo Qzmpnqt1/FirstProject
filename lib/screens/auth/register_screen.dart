@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../app/app_state.dart';
+import '../../app/app_scope.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final AppState state;
-  const RegisterScreen({super.key, required this.state});
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -17,28 +16,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool loading = false;
 
   Future<void> _register() async {
+    final state = context.appState;
+
     final em = email.text.trim();
     final pw = password.text;
+
     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(em)) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Некорректный email')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Некорректный email')),
+      );
       return;
     }
     if (pw.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Пароль от 6 символов')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пароль от 6 символов')),
+      );
       return;
     }
     if (pw != repeat.text) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Пароли не совпадают')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Пароли не совпадают')),
+      );
       return;
     }
+
     setState(() => loading = true);
-    final ok = await widget.state.register(fullName.text.trim(), em, pw);
+    final ok = await state.register(fullName.text.trim(), em, pw);
     setState(() => loading = false);
+
     if (ok && mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация выполнена, войдите')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Регистрация выполнена, войдите')),
+      );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Этот email уже зарегистрирован')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Этот email уже зарегистрирован')),
+      );
     }
   }
 
@@ -57,28 +71,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   TextField(
                     controller: fullName,
-                    decoration: const InputDecoration(labelText: 'ФИО', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'ФИО',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: password,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Пароль', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'Пароль',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: repeat,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Повтор пароля', border: OutlineInputBorder()),
+                    decoration: const InputDecoration(
+                      labelText: 'Повтор пароля',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  ElevatedButton(onPressed: loading ? null : _register, child: Text(loading ? 'Создаём...' : 'Создать аккаунт')),
+                  ElevatedButton(
+                    onPressed: loading ? null : _register,
+                    child: Text(loading ? 'Создаём...' : 'Создать аккаунт'),
+                  ),
                 ],
               ),
             ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../app/app_state.dart';
 import '../../app/app_colors.dart';
+import '../../app/app_scope.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final AppState state;
-  const LoginScreen({super.key, required this.state});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -17,9 +16,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool loading = false;
 
   Future<void> _login() async {
+    final state = context.appState;
+
     setState(() => loading = true);
-    final ok = await widget.state.login(email.text.trim(), password.text);
+    final ok = await state.login(email.text.trim(), password.text);
     setState(() => loading = false);
+
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Неверный email или пароль')),
@@ -40,13 +42,17 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Вход', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+                  const Text(
+                    'Вход',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                  ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      labelText: 'Email', border: OutlineInputBorder(),
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -54,7 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: password,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: 'Пароль', border: OutlineInputBorder(),
+                      labelText: 'Пароль',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -66,7 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => RegisterScreen(state: widget.state)),
+                        MaterialPageRoute(
+                          builder: (_) => const RegisterScreen(),
+                        ),
                       );
                     },
                     child: const Text('Нет аккаунта? Зарегистрироваться'),
