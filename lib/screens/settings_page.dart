@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import '../app/app_state.dart';
+import '../app/app_scope.dart';
 import '../app/app_colors.dart';
 import '../widgets/settings_header.dart';
 
 class SettingsPage extends StatelessWidget {
-  final AppState state;
-  const SettingsPage({super.key, required this.state});
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 88),
       children: [
@@ -20,14 +21,22 @@ class SettingsPage extends StatelessWidget {
               value: val,
               onChanged: (v) => state.setDark(v),
               title: const Text('Тёмная тема'),
-              subtitle: const Text('Переключение ThemeMode для всего приложения'),
-              secondary: const Icon(Icons.dark_mode_rounded, color: AppColors.primary),
+              subtitle: const Text(
+                'Переключение ThemeMode для всего приложения',
+              ),
+              secondary: const Icon(
+                Icons.dark_mode_rounded,
+                color: AppColors.primary,
+              ),
             ),
           ),
         ),
         Card(
           child: ListTile(
-            leading: const Icon(Icons.timer_rounded, color: AppColors.primary),
+            leading: const Icon(
+              Icons.timer_rounded,
+              color: AppColors.primary,
+            ),
             title: const Text('Текущее значение счётчика'),
             subtitle: ValueListenableBuilder<int>(
               valueListenable: state.counter,
@@ -54,10 +63,12 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
         ),
-        // === новый блок: выход из аккаунта ===
         Card(
           child: ListTile(
-            leading: const Icon(Icons.logout_rounded, color: AppColors.primary),
+            leading: const Icon(
+              Icons.logout_rounded,
+              color: AppColors.primary,
+            ),
             title: const Text('Выйти из аккаунта'),
             subtitle: const Text('Завершить текущую сессию'),
             trailing: ElevatedButton(

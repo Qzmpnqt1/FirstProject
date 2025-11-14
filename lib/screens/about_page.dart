@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../app/app_state.dart';
+
+import '../app/app_scope.dart';
 import '../app/app_colors.dart';
 import '../data/task.dart';
 import '../widgets/multi_listenable_builder.dart';
 
 class AboutPage extends StatefulWidget {
-  final AppState state;
-  const AboutPage({super.key, required this.state});
+  const AboutPage({super.key});
 
   @override
   State<AboutPage> createState() => _AboutPageState();
@@ -18,7 +18,6 @@ class _AboutPageState extends State<AboutPage> {
   static const String _version = '1.0.0';
   int _taps = 0;
 
-  // Плоская иконка страницы
   static const _aboutUrl =
       'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4c4.png';
 
@@ -27,7 +26,7 @@ class _AboutPageState extends State<AboutPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        await precacheImage(CachedNetworkImageProvider(_aboutUrl), context);
+        await precacheImage(const CachedNetworkImageProvider(_aboutUrl), context);
       } catch (_) {}
     });
   }
@@ -47,11 +46,14 @@ class _AboutPageState extends State<AboutPage> {
         context: context,
         builder: (_) => AlertDialog(
           title: const Text('🎉 Пасхалка'),
-          content: const Text('Молодец! Ты нашёл пасхалку. Удачи на защите!'),
+          content: const Text(
+            'Молодец! Ты нашёл пасхалку. Удачи на защите!',
+          ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Ок')),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Ок'),
+            ),
           ],
         ),
       );
@@ -60,12 +62,13 @@ class _AboutPageState extends State<AboutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
         Card(
           child: ListTile(
-            // (4) Плоская иконка «страница»
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: SizedBox(
@@ -74,25 +77,30 @@ class _AboutPageState extends State<AboutPage> {
                 child: CachedNetworkImage(
                   imageUrl: _aboutUrl,
                   fit: BoxFit.contain,
-                  placeholder: (_, __) => Container(color: Color(0xFFE2E8F0)),
-                  errorWidget: (_, __, ___) =>
-                  const Icon(Icons.apps_rounded, color: AppColors.primary),
+                  placeholder: (_, __) => Container(color: const Color(0xFFE2E8F0)),
+                  errorWidget: (_, __, ___) => const Icon(
+                    Icons.apps_rounded,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
             ),
             title: const Text('Практическая работа №3'),
             subtitle: const Text(
-                'Демонстрация Stateless/Stateful виджетов и смены контента'),
+              'Демонстрация Stateless/Stateful виджетов и смены контента',
+            ),
             onTap: _easterEggTap,
           ),
         ),
         Card(
           child: ListTile(
-            leading:
-            const Icon(Icons.person_outline_rounded, color: AppColors.primary),
+            leading: const Icon(
+              Icons.person_outline_rounded,
+              color: AppColors.primary,
+            ),
             title: ValueListenableBuilder2<String, String>(
-              listenableA: widget.state.name,
-              listenableB: widget.state.role,
+              listenableA: state.name,
+              listenableB: state.role,
               builder: (_, name, role, __) => Text('$name — $role'),
             ),
             subtitle: const Text('Данные берутся из экрана «Профиль»'),
@@ -100,10 +108,12 @@ class _AboutPageState extends State<AboutPage> {
         ),
         Card(
           child: ListTile(
-            leading:
-            const Icon(Icons.checklist_rounded, color: AppColors.primary),
+            leading: const Icon(
+              Icons.checklist_rounded,
+              color: AppColors.primary,
+            ),
             title: ValueListenableBuilder<List<Task>>(
-              valueListenable: widget.state.tasks,
+              valueListenable: state.tasks,
               builder: (_, tasks, __) {
                 final done = tasks.where((t) => t.done).length;
                 return Text('Задач: ${tasks.length}, выполнено: $done');
@@ -114,10 +124,12 @@ class _AboutPageState extends State<AboutPage> {
         ),
         Card(
           child: ListTile(
-            leading:
-            const Icon(Icons.timer_rounded, color: AppColors.primary),
+            leading: const Icon(
+              Icons.timer_rounded,
+              color: AppColors.primary,
+            ),
             title: ValueListenableBuilder<int>(
-              valueListenable: widget.state.counter,
+              valueListenable: state.counter,
               builder: (_, v, __) => Text('Счётчик: $v'),
             ),
             subtitle: const Text('Общее значение из вкладки «Счётчик»'),
@@ -125,8 +137,10 @@ class _AboutPageState extends State<AboutPage> {
         ),
         Card(
           child: ListTile(
-            leading:
-            const Icon(Icons.info_outline_rounded, color: AppColors.primary),
+            leading: const Icon(
+              Icons.info_outline_rounded,
+              color: AppColors.primary,
+            ),
             title: const Text('Версия'),
             subtitle: Text(_version),
             trailing: OutlinedButton(

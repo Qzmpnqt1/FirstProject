@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import '../app/app_state.dart';
 import '../app/app_colors.dart';
+import '../app/app_scope.dart';
+import '../data/task.dart';
+import '../data/auth_user.dart';
 import 'home_page.dart';
 import 'profile_page.dart';
 import 'counter_page.dart';
 import 'settings_page.dart';
 import 'about_page.dart';
-import '../data/task.dart';
-import '../data/auth_user.dart'; // добавлено
-import 'modules/modules_screen.dart'; // добавлено
+import 'modules/modules_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final AppState state;
-  const HomeScreen({super.key, required this.state});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -32,22 +31,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      HomePage(state: widget.state),
-      ModulesScreen(state: widget.state), // новая страница
-      ProfilePage(state: widget.state),
-      CounterPage(state: widget.state),
-      SettingsPage(state: widget.state),
-      AboutPage(state: widget.state),
+    final state = context.appState;
+
+    final pages = const [
+      HomePage(),
+      ModulesScreen(),
+      ProfilePage(),
+      CounterPage(),
+      SettingsPage(),
+      AboutPage(),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_titleFor(_index)),
         actions: [
-          // показ текущего пользователя
+          // текущий пользователь
           ValueListenableBuilder<AuthUser?>(
-            valueListenable: widget.state.user,
+            valueListenable: state.user,
             builder: (_, u, __) => u == null
                 ? const SizedBox.shrink()
                 : Padding(
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // статистика задач
           ValueListenableBuilder<List<Task>>(
-            valueListenable: widget.state.tasks,
+            valueListenable: state.tasks,
             builder: (_, tasks, __) {
               final done = tasks.where((t) => t.done).length;
               return Padding(
@@ -74,8 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
+      body: const DecoratedBox(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -83,21 +84,61 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: IndexedStack(index: _index, children: pages),
+          child: _HomeBody(),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: "Главная"),
-          BottomNavigationBarItem(icon: Icon(Icons.school_rounded), label: "Модули"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: "Профиль"),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle_rounded), label: "Счётчик"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings_rounded), label: "Настройки"),
-          BottomNavigationBarItem(icon: Icon(Icons.info_rounded), label: "О приложении"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: "Главная",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school_rounded),
+            label: "Модули",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_rounded),
+            label: "Профиль",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_circle_rounded),
+            label: "Счётчик",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings_rounded),
+            label: "Настройки",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info_rounded),
+            label: "О приложении",
+          ),
         ],
       ),
     );
+  }
+}
+
+/// Выделил тело в отдельный виджет, чтобы не мешать const
+class _HomeBody extends StatelessWidget {
+  const _HomeBody();
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = const [
+      HomePage(),
+      ModulesScreen(),
+      ProfilePage(),
+      CounterPage(),
+      SettingsPage(),
+      AboutPage(),
+    ];
+
+    final stateful = context.findAncestorStateOfType<_HomeScreenState>();
+    final index = stateful?._index ?? 0;
+
+    return IndexedStack(index: index, children: pages);
   }
 }

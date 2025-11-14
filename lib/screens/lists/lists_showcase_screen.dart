@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../app/app_state.dart';
+import '../../app/app_scope.dart';
 import '../../app/app_colors.dart';
 
 class ListsShowcaseScreen extends StatefulWidget {
-  final AppState state;
-  const ListsShowcaseScreen({super.key, required this.state});
+  const ListsShowcaseScreen({super.key});
 
   @override
   State<ListsShowcaseScreen> createState() => _ListsShowcaseScreenState();
 }
 
-class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTickerProviderStateMixin {
+class _ListsShowcaseScreenState extends State<ListsShowcaseScreen>
+    with SingleTickerProviderStateMixin {
   late final TabController _tab = TabController(length: 3, vsync: this);
   final input = TextEditingController();
 
-  // Плоская иконка «книги»
   static const _modulesUrl =
       'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4da.png';
 
@@ -24,7 +23,10 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
-        await precacheImage(CachedNetworkImageProvider(_modulesUrl), context);
+        await precacheImage(
+          const CachedNetworkImageProvider(_modulesUrl),
+          context,
+        );
       } catch (_) {}
     });
   }
@@ -39,7 +41,8 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
   Future<void> _add() async {
     final text = input.text.trim();
     if (text.isEmpty) return;
-    await widget.state.addModule(text);
+    final state = context.appState;
+    await state.addModule(text);
     input.clear();
   }
 
@@ -67,8 +70,10 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
                 child: CachedNetworkImage(
                   imageUrl: _modulesUrl,
                   fit: BoxFit.contain,
-                  placeholder: (_, __) => Container(color: Color(0xFFE2E8F0)),
-                  errorWidget: (_, __, ___) => const Icon(Icons.menu_book_rounded),
+                  placeholder: (_, __) =>
+                      Container(color: const Color(0xFFE2E8F0)),
+                  errorWidget: (_, __, ___) =>
+                  const Icon(Icons.menu_book_rounded),
                 ),
               ),
             ),
@@ -77,7 +82,7 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
       ),
       body: Column(
         children: [
-          // Панель добавления
+          // панель добавления
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
             child: Row(
@@ -87,7 +92,10 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
                     controller: input,
                     decoration: const InputDecoration(
                       hintText: 'Новый модуль...',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                        BorderRadius.all(Radius.circular(12)),
+                      ),
                     ),
                     onSubmitted: (_) => _add(),
                   ),
@@ -105,10 +113,10 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
           Expanded(
             child: TabBarView(
               controller: _tab,
-              children: [
-                _ColumnList(state: widget.state),
-                _BuilderList(state: widget.state),
-                _SeparatedList(state: widget.state),
+              children: const [
+                _ColumnList(),
+                _BuilderList(),
+                _SeparatedList(),
               ],
             ),
           ),
@@ -118,12 +126,13 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
   }
 }
 
-// ----- остальной код списков (без изменений) -----
 class _ColumnList extends StatelessWidget {
-  final AppState state;
-  const _ColumnList({required this.state});
+  const _ColumnList();
+
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return ValueListenableBuilder<List<String>>(
       valueListenable: state.modules,
       builder: (_, modules, __) {
@@ -139,7 +148,10 @@ class _ColumnList extends StatelessWidget {
                   onDismissed: (_) => state.deleteModuleAt(i),
                   child: Card(
                     child: ListTile(
-                      leading: const Icon(Icons.menu_book_rounded, color: AppColors.primary),
+                      leading: const Icon(
+                        Icons.menu_book_rounded,
+                        color: AppColors.primary,
+                      ),
                       title: Text(modules[i]),
                       trailing: IconButton(
                         tooltip: 'Удалить',
@@ -160,8 +172,12 @@ class _ColumnList extends StatelessWidget {
       },
     );
   }
+
   Widget _bg(Alignment a) => Container(
-    decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
+    decoration: BoxDecoration(
+      color: Colors.redAccent,
+      borderRadius: BorderRadius.circular(16),
+    ),
     alignment: a,
     padding: const EdgeInsets.symmetric(horizontal: 20),
     child: const Icon(Icons.delete, color: Colors.white),
@@ -169,10 +185,12 @@ class _ColumnList extends StatelessWidget {
 }
 
 class _BuilderList extends StatelessWidget {
-  final AppState state;
-  const _BuilderList({required this.state});
+  const _BuilderList();
+
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return ValueListenableBuilder<List<String>>(
       valueListenable: state.modules,
       builder: (_, modules, __) {
@@ -189,7 +207,10 @@ class _BuilderList extends StatelessWidget {
             onDismissed: (_) => state.deleteModuleAt(i),
             child: Card(
               child: ListTile(
-                leading: const Icon(Icons.library_books_rounded, color: AppColors.primary),
+                leading: const Icon(
+                  Icons.library_books_rounded,
+                  color: AppColors.primary,
+                ),
                 title: Text(modules[i]),
                 trailing: IconButton(
                   tooltip: 'Удалить',
@@ -203,8 +224,12 @@ class _BuilderList extends StatelessWidget {
       },
     );
   }
+
   Widget _bg(Alignment a) => Container(
-    decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
+    decoration: BoxDecoration(
+      color: Colors.redAccent,
+      borderRadius: BorderRadius.circular(16),
+    ),
     alignment: a,
     padding: const EdgeInsets.symmetric(horizontal: 20),
     child: const Icon(Icons.delete, color: Colors.white),
@@ -212,10 +237,12 @@ class _BuilderList extends StatelessWidget {
 }
 
 class _SeparatedList extends StatelessWidget {
-  final AppState state;
-  const _SeparatedList({required this.state});
+  const _SeparatedList();
+
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return ValueListenableBuilder<List<String>>(
       valueListenable: state.modules,
       builder: (_, modules, __) {
@@ -233,9 +260,14 @@ class _SeparatedList extends StatelessWidget {
             onDismissed: (_) => state.deleteModuleAt(i),
             child: Card(
               child: ListTile(
-                leading: const Icon(Icons.school_rounded, color: AppColors.primary),
+                leading: const Icon(
+                  Icons.school_rounded,
+                  color: AppColors.primary,
+                ),
                 title: Text(modules[i]),
-                subtitle: Text('Модуль №${i + 1} из ${modules.length}'),
+                subtitle: Text(
+                  'Модуль №${i + 1} из ${modules.length}',
+                ),
                 trailing: IconButton(
                   tooltip: 'Удалить',
                   icon: const Icon(Icons.delete_outline),
@@ -248,8 +280,12 @@ class _SeparatedList extends StatelessWidget {
       },
     );
   }
+
   Widget _bg(Alignment a) => Container(
-    decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
+    decoration: BoxDecoration(
+      color: Colors.redAccent,
+      borderRadius: BorderRadius.circular(16),
+    ),
     alignment: a,
     padding: const EdgeInsets.symmetric(horizontal: 20),
     child: const Icon(Icons.delete, color: Colors.white),

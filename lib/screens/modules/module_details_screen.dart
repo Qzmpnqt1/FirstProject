@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../app/app_state.dart';
+import '../../app/app_scope.dart';
 import '../../data/module.dart';
 import '../../widgets/topic_row.dart';
 
 class ModuleDetailsScreen extends StatelessWidget {
-  final AppState state;
   final String moduleId;
-  const ModuleDetailsScreen({super.key, required this.state, required this.moduleId});
+
+  const ModuleDetailsScreen({
+    super.key,
+    required this.moduleId,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return ValueListenableBuilder<List<Module>>(
       valueListenable: state.modulesEx,
       builder: (_, list, __) {
@@ -39,22 +44,28 @@ class ModuleDetailsScreen extends StatelessWidget {
                 child: ListTile(
                   leading: CircularProgressIndicator(value: m.progress),
                   title: Text('Прогресс: $progressPercent%'),
-                  subtitle: Text('Тип: ${_type(m.type)} • Часы: ${m.hours} • Статус: ${_status(m.status)}'),
+                  subtitle: Text(
+                    'Тип: ${_type(m.type)} • Часы: ${m.hours} • Статус: ${_status(m.status)}',
+                  ),
                 ),
               ),
               _section(
                 context: context,
                 title: 'Теория',
                 items: m.topics,
-                onToggle: (i, v) => state.toggleTopic(moduleId, true, i, v),
-                onDelete: (i) => state.deleteTopic(moduleId, true, i),
+                onToggle: (i, v) =>
+                    state.toggleTopic(moduleId, true, i, v),
+                onDelete: (i) =>
+                    state.deleteTopic(moduleId, true, i),
               ),
               _section(
                 context: context,
                 title: 'Практика',
                 items: m.practices,
-                onToggle: (i, v) => state.toggleTopic(moduleId, false, i, v),
-                onDelete: (i) => state.deleteTopic(moduleId, false, i),
+                onToggle: (i, v) =>
+                    state.toggleTopic(moduleId, false, i, v),
+                onDelete: (i) =>
+                    state.deleteTopic(moduleId, false, i),
               ),
             ],
           ),
@@ -75,7 +86,12 @@ class ModuleDetailsScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
-            ListTile(title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700))),
+            ListTile(
+              title: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
             const Divider(height: 1),
             if (items.isEmpty)
               const Padding(
@@ -96,17 +112,28 @@ class ModuleDetailsScreen extends StatelessWidget {
   }
 
   void _rename(BuildContext context, Module m) {
+    final state = context.appState;
     final c = TextEditingController(text: m.title);
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Переименовать модуль'),
-        content: TextField(controller: c, decoration: const InputDecoration(labelText: 'Название')),
+        content: TextField(
+          controller: c,
+          decoration:
+          const InputDecoration(labelText: 'Название'),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Отмена'),
+          ),
           ElevatedButton(
             onPressed: () {
-              if (c.text.trim().isNotEmpty) state.renameModule(m.id, c.text.trim());
+              if (c.text.trim().isNotEmpty) {
+                state.renameModule(m.id, c.text.trim());
+              }
               Navigator.pop(context);
             },
             child: const Text('Сохранить'),
@@ -117,8 +144,11 @@ class ModuleDetailsScreen extends StatelessWidget {
   }
 
   void _addItem(BuildContext context) {
+    final state = context.appState;
+
     final c = TextEditingController();
     bool isTopic = true;
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -126,13 +156,23 @@ class ModuleDetailsScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: c, decoration: const InputDecoration(labelText: 'Название')),
+            TextField(
+              controller: c,
+              decoration:
+              const InputDecoration(labelText: 'Название'),
+            ),
             const SizedBox(height: 8),
             DropdownButtonFormField<bool>(
               value: isTopic,
               items: const [
-                DropdownMenuItem(value: true, child: Text('Теория')),
-                DropdownMenuItem(value: false, child: Text('Практика')),
+                DropdownMenuItem(
+                  value: true,
+                  child: Text('Теория'),
+                ),
+                DropdownMenuItem(
+                  value: false,
+                  child: Text('Практика'),
+                ),
               ],
               onChanged: (v) => isTopic = v ?? true,
               decoration: const InputDecoration(labelText: 'Тип'),
@@ -140,11 +180,13 @@ class ModuleDetailsScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Отмена'),
+          ),
           ElevatedButton(
             onPressed: () {
               if (c.text.trim().isEmpty) return;
-              // Делегируем контейнеру состояния
               state.addTopic(moduleId, isTopic, c.text.trim());
               Navigator.pop(context);
             },

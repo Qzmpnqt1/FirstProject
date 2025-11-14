@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../app/app_state.dart';
+import '../../app/app_scope.dart';
 import '../../data/module.dart';
 import '../../widgets/modules_list_view.dart';
 import 'module_details_screen.dart';
 
 class ModulesScreen extends StatelessWidget {
-  final AppState state;
-  const ModulesScreen({super.key, required this.state});
+  const ModulesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final state = context.appState;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Учебные модули')),
       floatingActionButton: FloatingActionButton(
@@ -23,7 +24,7 @@ class ModulesScreen extends StatelessWidget {
             modules: list,
             onOpen: (m) => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => ModuleDetailsScreen(state: state, moduleId: m.id),
+                builder: (_) => ModuleDetailsScreen(moduleId: m.id),
               ),
             ),
             onDelete: (m) => state.deleteModuleEx(m.id),
@@ -34,6 +35,8 @@ class ModulesScreen extends StatelessWidget {
   }
 
   void _createModuleDialog(BuildContext context) {
+    final state = context.appState;
+
     final title = TextEditingController();
     final hours = TextEditingController(text: '4');
     ModuleType type = ModuleType.lecture;
@@ -45,14 +48,27 @@ class ModulesScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: title, decoration: const InputDecoration(labelText: 'Название')),
+            TextField(
+              controller: title,
+              decoration:
+              const InputDecoration(labelText: 'Название'),
+            ),
             const SizedBox(height: 8),
             DropdownButtonFormField<ModuleType>(
               value: type,
               items: const [
-                DropdownMenuItem(value: ModuleType.lecture, child: Text('Лекция')),
-                DropdownMenuItem(value: ModuleType.practice, child: Text('Практика')),
-                DropdownMenuItem(value: ModuleType.lab, child: Text('Лабораторная')),
+                DropdownMenuItem(
+                  value: ModuleType.lecture,
+                  child: Text('Лекция'),
+                ),
+                DropdownMenuItem(
+                  value: ModuleType.practice,
+                  child: Text('Практика'),
+                ),
+                DropdownMenuItem(
+                  value: ModuleType.lab,
+                  child: Text('Лабораторная'),
+                ),
               ],
               onChanged: (v) => type = v ?? ModuleType.lecture,
               decoration: const InputDecoration(labelText: 'Тип'),
@@ -66,7 +82,10 @@ class ModulesScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Отмена'),
+          ),
           ElevatedButton(
             onPressed: () {
               final h = int.tryParse(hours.text) ?? 0;
