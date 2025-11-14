@@ -1,21 +1,37 @@
+// lib/app/my_app.dart
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+
 import 'app_state.dart';
 import 'app_colors.dart';
-import '../screens/home_screen.dart';
+import 'app_scope.dart';
+import 'auth_gate.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  final AppState state = AppState();
+  late final AppState _state;
 
   @override
   void initState() {
     super.initState();
-    state.themeDark.addListener(() => setState(() {}));
+    // Берём AppState из DI-контейнера
+    _state = GetIt.I<AppState>();
+    // Подписываемся на смену темы
+    _state.themeDark.addListener(_onThemeChanged);
+  }
+
+  void _onThemeChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    _state.themeDark.removeListener(_onThemeChanged);
+    super.dispose();
   }
 
   @override
@@ -34,7 +50,11 @@ class _MyAppState extends State<MyApp> {
         elevation: 2,
         foregroundColor: Colors.white,
         centerTitle: true,
-        titleTextStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+        titleTextStyle: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.navBg,
@@ -57,18 +77,27 @@ class _MyAppState extends State<MyApp> {
       cardTheme: const CardThemeData(
         color: Colors.white,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
         margin: EdgeInsets.all(16),
       ),
       textTheme: const TextTheme(
         bodyMedium: TextStyle(color: AppColors.textSecondary, fontSize: 16),
-        titleLarge: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+        titleLarge: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
 
     final dark = ThemeData(
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary, brightness: Brightness.dark),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.dark,
+      ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Color(0xFF0E1A18),
         selectedItemColor: AppColors.accent,
@@ -79,17 +108,22 @@ class _MyAppState extends State<MyApp> {
       ),
       cardTheme: const CardThemeData(
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
         margin: EdgeInsets.all(16),
       ),
     );
 
-    return MaterialApp(
-      title: 'Практическая работа №6. Амерханов К.А. ИКБО-11-22',
-      theme: light,
-      darkTheme: dark,
-      themeMode: state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
-      home: HomeScreen(state: state),
+    return AppScope(
+      // через AppScope всё дерево ниже может получить AppState через context.appState
+      child: MaterialApp(
+        title: 'Практическая работа №8. Амерханов К.А. ИКБО-11-22',
+        theme: light,
+        darkTheme: dark,
+        themeMode: _state.themeDark.value ? ThemeMode.dark : ThemeMode.light,
+        home: const AuthGate(),
+      ),
     );
   }
 }
