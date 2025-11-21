@@ -14,10 +14,20 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Настройки и сервис')),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 88),
-          children: [
+      body: BlocListener<AppCubit, AppState>(
+        listenWhen: (previous, current) => previous.user != current.user,
+        listener: (context, state) {
+          if (state.user == null) {
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const AuthGate()),
+              (_) => false,
+            );
+          }
+        },
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 88),
+            children: [
           const SettingsHeader(),
           BlocSelector<AppCubit, AppState, bool>(
             selector: (state) => state.themeDark,
@@ -91,25 +101,21 @@ class SettingsPage extends StatelessWidget {
               },
             ),
           ),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.logout_rounded, color: AppColors.primary),
-              title: const Text('Выйти из аккаунта'),
-              subtitle: const Text('Завершить текущую сессию'),
-              trailing: ElevatedButton(
-                onPressed: () async {
-                  await context.read<AppCubit>().logout();
-                  if (!context.mounted) return;
-                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const AuthGate()),
-                    (_) => false,
-                  );
-                },
-                child: const Text('Выйти'),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.logout_rounded, color: AppColors.primary),
+                title: const Text('Выйти из аккаунта'),
+                subtitle: const Text('Завершить текущую сессию'),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    await context.read<AppCubit>().logout();
+                  },
+                  child: const Text('Выйти'),
+                ),
               ),
             ),
+          ],
           ),
-        ],
         ),
       ),
     );

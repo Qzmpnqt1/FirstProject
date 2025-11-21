@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -6,9 +5,6 @@ import '../app/app_colors.dart';
 import '../app/app_state.dart';
 import '../data/study_session.dart';
 import 'lists/lists_showcase_screen.dart';
-
-const _homeBannerUrl =
-    'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4bb.png';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,16 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        await precacheImage(CachedNetworkImageProvider(_homeBannerUrl), context);
-      } catch (_) {}
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,21 +130,20 @@ class _HeroCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: SizedBox(
-              height: 90,
-              width: double.infinity,
-              child: CachedNetworkImage(
-                imageUrl: _homeBannerUrl,
-                fit: BoxFit.cover,
-                placeholder: (_, __) => Container(color: Colors.white24),
-                errorWidget: (_, __, ___) => Container(
-                  color: Colors.white24,
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.broken_image_rounded, color: Colors.white),
-                ),
+          const SizedBox(height: 16),
+          Container(
+            height: 24,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              color: Colors.white.withOpacity(0.12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: (counter % 10) / 10,
+                backgroundColor: Colors.white24,
+                valueColor: const AlwaysStoppedAnimation(AppColors.accent),
               ),
             ),
           ),
@@ -185,44 +170,56 @@ class _SummaryGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.4,
-      ),
-      children: [
-        _StatCard(
-          icon: Icons.layers_rounded,
-          title: 'Модули',
-          value: '$modulesCompleted / $modulesTotal',
-          subtitle: 'пройдено',
-        ),
-        _StatCard(
-          icon: Icons.check_circle_rounded,
-          title: 'Задачи',
-          value: tasksTotal == 0 ? '0%' : '${(tasksDone / tasksTotal * 100).toStringAsFixed(0)}%',
-          subtitle: '$tasksDone из $tasksTotal',
-          color: Colors.teal,
-        ),
-        _StatCard(
-          icon: Icons.event_available_rounded,
-          title: 'Расписание',
-          value: '$upcomingSessions',
-          subtitle: 'встреч впереди',
-          color: Colors.deepOrange,
-        ),
-        _StatCard(
-          icon: Icons.show_chart_rounded,
-          title: 'Активность',
-          value: tasksTotal == 0 ? '--' : '$tasksDone из $tasksTotal',
-          subtitle: 'контроль практики',
-          color: Colors.purple,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        int columns = 4;
+        if (width < 720) {
+          columns = 1;
+        } else if (width < 1080) {
+          columns = 2;
+        }
+        final aspectRatio = columns >= 4 ? 2.4 : (columns == 2 ? 1.6 : 2.8);
+        return GridView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: aspectRatio,
+          ),
+          children: [
+            _StatCard(
+              icon: Icons.layers_rounded,
+              title: 'Модули',
+              value: '$modulesCompleted / $modulesTotal',
+              subtitle: 'пройдено',
+            ),
+            _StatCard(
+              icon: Icons.check_circle_rounded,
+              title: 'Задачи',
+              value: tasksTotal == 0 ? '0%' : '${(tasksDone / tasksTotal * 100).toStringAsFixed(0)}%',
+              subtitle: '$tasksDone из $tasksTotal',
+              color: Colors.teal,
+            ),
+            _StatCard(
+              icon: Icons.event_available_rounded,
+              title: 'Расписание',
+              value: '$upcomingSessions',
+              subtitle: 'встреч впереди',
+              color: Colors.deepOrange,
+            ),
+            _StatCard(
+              icon: Icons.show_chart_rounded,
+              title: 'Активность',
+              value: tasksTotal == 0 ? '--' : '$tasksDone из $tasksTotal',
+              subtitle: 'контроль практики',
+              color: Colors.purple,
+            ),
+          ],
+        );
+      },
     );
   }
 }
