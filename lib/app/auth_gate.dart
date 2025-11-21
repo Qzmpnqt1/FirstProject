@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import '../data/auth_user.dart';
-import 'app_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../screens/auth/login_screen.dart';
 import '../screens/home_screen.dart';
+import 'app_state.dart';
 
 class AuthGate extends StatelessWidget {
-  final AppState state;
-  const AuthGate({super.key, required this.state});
+  const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<AuthUser?>(
-      valueListenable: state.user,
-      builder: (_, u, __) {
-        if (u == null) {
-          return LoginScreen(state: state);
+    return BlocBuilder<AppCubit, AppState>(
+      buildWhen: (previous, current) => previous.user != current.user,
+      builder: (context, state) {
+        if (state.user == null) {
+          return const LoginScreen();
         }
-        return HomeScreen(state: state);
+        return const HomeScreen();
       },
     );
   }

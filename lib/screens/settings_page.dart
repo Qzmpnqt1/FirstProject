@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../app/app_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../app/app_colors.dart';
+import '../app/app_state.dart';
 import '../widgets/settings_header.dart';
 
 class SettingsPage extends StatelessWidget {
-  final AppState state;
-  const SettingsPage({super.key, required this.state});
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +14,12 @@ class SettingsPage extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 88),
       children: [
         const SettingsHeader(),
-        ValueListenableBuilder<bool>(
-          valueListenable: state.themeDark,
-          builder: (_, val, __) => Card(
+        BlocSelector<AppCubit, AppState, bool>(
+          selector: (state) => state.themeDark,
+          builder: (_, isDark) => Card(
             child: SwitchListTile(
-              value: val,
-              onChanged: (v) => state.setDark(v),
+              value: isDark,
+              onChanged: (value) => context.read<AppCubit>().setDark(value),
               title: const Text('Тёмная тема'),
               subtitle: const Text('Переключение ThemeMode для всего приложения'),
               secondary: const Icon(Icons.dark_mode_rounded, color: AppColors.primary),
@@ -29,39 +30,56 @@ class SettingsPage extends StatelessWidget {
           child: ListTile(
             leading: const Icon(Icons.timer_rounded, color: AppColors.primary),
             title: const Text('Текущее значение счётчика'),
-            subtitle: ValueListenableBuilder<int>(
-              valueListenable: state.counter,
-              builder: (_, v, __) => Text('Сейчас: $v'),
+            subtitle: BlocSelector<AppCubit, AppState, int>(
+              selector: (state) => state.counter,
+              builder: (_, value) => Text('Сейчас: $value'),
             ),
             trailing: Wrap(
               spacing: 6,
               children: [
                 IconButton(
                   tooltip: 'Уменьшить',
-                  onPressed: state.decCounter,
+                  onPressed: () => context.read<AppCubit>().decCounter(),
                   icon: const Icon(Icons.remove_circle_outline),
                 ),
                 IconButton(
                   tooltip: 'Увеличить',
-                  onPressed: state.incCounter,
+                  onPressed: () => context.read<AppCubit>().incCounter(),
                   icon: const Icon(Icons.add_circle_outline),
                 ),
                 ElevatedButton(
-                  onPressed: state.resetCounter,
+                  onPressed: () => context.read<AppCubit>().resetCounter(),
                   child: const Text('Сброс'),
                 ),
               ],
             ),
           ),
         ),
-        // === новый блок: выход из аккаунта ===
+        Card(
+          child: SwitchListTile(
+            value: context.select((AppCubit cubit) => cubit.state.notifications),
+            onChanged: (value) => context.read<AppCubit>().setNotifications(value),
+            title: const Text('Уведомления'),
+            subtitle: const Text('Учебные напоминания и алерты'),
+            secondary: const Icon(Icons.notifications_active_rounded, color: AppColors.primary),
+          ),
+        ),
+        Card(
+          child: SwitchListTile(
+            value: context.select((AppCubit cubit) => cubit.state.analytics),
+            onChanged: (value) => context.read<AppCubit>().setAnalytics(value),
+            title: const Text('Аналитика'),
+            subtitle: const Text('Собирать обезличенную статистику'),
+            secondary: const Icon(Icons.analytics_rounded, color: AppColors.primary),
+          ),
+        ),
         Card(
           child: ListTile(
             leading: const Icon(Icons.logout_rounded, color: AppColors.primary),
             title: const Text('Выйти из аккаунта'),
             subtitle: const Text('Завершить текущую сессию'),
             trailing: ElevatedButton(
-              onPressed: state.logout,
+              onPressed: () => context.read<AppCubit>().logout(),
               child: const Text('Выйти'),
             ),
           ),

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../app/app_state.dart';
 import '../../data/module.dart';
 import '../../widgets/modules_list_view.dart';
 import 'module_details_screen.dart';
 
 class ModulesScreen extends StatelessWidget {
-  final AppState state;
-  const ModulesScreen({super.key, required this.state});
+  const ModulesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,17 +17,17 @@ class ModulesScreen extends StatelessWidget {
         onPressed: () => _createModuleDialog(context),
         child: const Icon(Icons.add),
       ),
-      body: ValueListenableBuilder<List<Module>>(
-        valueListenable: state.modulesEx,
-        builder: (_, list, __) {
+      body: BlocBuilder<AppCubit, AppState>(
+        buildWhen: (previous, current) => previous.modulesEx != current.modulesEx,
+        builder: (_, state) {
           return ModulesListView(
-            modules: list,
+            modules: state.modulesEx,
             onOpen: (m) => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => ModuleDetailsScreen(state: state, moduleId: m.id),
+                builder: (_) => ModuleDetailsScreen(moduleId: m.id),
               ),
             ),
-            onDelete: (m) => state.deleteModuleEx(m.id),
+            onDelete: (m) => context.read<AppCubit>().deleteModuleEx(m.id),
           );
         },
       ),
@@ -71,7 +72,7 @@ class ModulesScreen extends StatelessWidget {
             onPressed: () {
               final h = int.tryParse(hours.text) ?? 0;
               if (title.text.trim().isEmpty || h <= 0) return;
-              state.addModuleEx(title.text.trim(), type, h);
+              context.read<AppCubit>().addModuleEx(title.text.trim(), type, h);
               Navigator.pop(context);
             },
             child: const Text('Создать'),

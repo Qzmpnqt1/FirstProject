@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import '../app/app_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../app/app_colors.dart';
-import 'home_page.dart';
-import 'profile_page.dart';
-import 'counter_page.dart';
-import 'settings_page.dart';
-import 'about_page.dart';
+import '../app/app_state.dart';
+import '../data/auth_user.dart';
 import '../data/task.dart';
-import '../data/auth_user.dart'; // добавлено
-import 'modules/modules_screen.dart'; // добавлено
+import 'about_page.dart';
+import 'counter_page.dart';
+import 'home_page.dart';
+import 'modules/modules_screen.dart';
+import 'profile_page.dart';
+import 'settings_page.dart';
 
 class HomeScreen extends StatefulWidget {
-  final AppState state;
-  const HomeScreen({super.key, required this.state});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,46 +23,44 @@ class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
   String _titleFor(int i) => switch (i) {
-    0 => 'Главная',
-    1 => 'Модули',
-    2 => 'Профиль',
-    3 => 'Счётчик',
-    4 => 'Настройки',
-    _ => 'О приложении',
-  };
+        0 => 'Главная',
+        1 => 'Модули',
+        2 => 'Профиль',
+        3 => 'Счётчик',
+        4 => 'Настройки',
+        _ => 'О приложении',
+      };
 
   @override
   Widget build(BuildContext context) {
-    final pages = [
-      HomePage(state: widget.state),
-      ModulesScreen(state: widget.state), // новая страница
-      ProfilePage(state: widget.state),
-      CounterPage(state: widget.state),
-      SettingsPage(state: widget.state),
-      AboutPage(state: widget.state),
+    final pages = const [
+      HomePage(),
+      ModulesScreen(),
+      ProfilePage(),
+      CounterPage(),
+      SettingsPage(),
+      AboutPage(),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_titleFor(_index)),
         actions: [
-          // показ текущего пользователя
-          ValueListenableBuilder<AuthUser?>(
-            valueListenable: widget.state.user,
-            builder: (_, u, __) => u == null
+          BlocSelector<AppCubit, AppState, AuthUser?>(
+            selector: (state) => state.user,
+            builder: (_, user) => user == null
                 ? const SizedBox.shrink()
                 : Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Chip(
-                label: Text(u.fullName),
-                backgroundColor: AppColors.accentSoft,
-              ),
-            ),
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Chip(
+                      label: Text(user.fullName),
+                      backgroundColor: AppColors.accentSoft,
+                    ),
+                  ),
           ),
-          // статистика задач
-          ValueListenableBuilder<List<Task>>(
-            valueListenable: widget.state.tasks,
-            builder: (_, tasks, __) {
+          BlocSelector<AppCubit, AppState, List<Task>>(
+            selector: (state) => state.tasks,
+            builder: (_, tasks) {
               final done = tasks.where((t) => t.done).length;
               return Padding(
                 padding: const EdgeInsets.only(right: 12),

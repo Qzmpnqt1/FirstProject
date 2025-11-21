@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../app/app_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../app/app_colors.dart';
+import '../../app/app_state.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final AppState state;
-  const LoginScreen({super.key, required this.state});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -18,9 +19,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     setState(() => loading = true);
-    final ok = await widget.state.login(email.text.trim(), password.text);
+    final ok = await context.read<AppCubit>().login(email.text.trim(), password.text);
+    if (!mounted) return;
     setState(() => loading = false);
-    if (!ok && mounted) {
+    if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Неверный email или пароль')),
       );
@@ -46,7 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: email,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      labelText: 'Email', border: OutlineInputBorder(),
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -54,7 +57,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: password,
                     obscureText: true,
                     decoration: const InputDecoration(
-                      labelText: 'Пароль', border: OutlineInputBorder(),
+                      labelText: 'Пароль',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -66,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => RegisterScreen(state: widget.state)),
+                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       );
                     },
                     child: const Text('Нет аккаунта? Зарегистрироваться'),

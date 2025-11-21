@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../app/app_state.dart';
 import '../../data/module.dart';
 import '../../widgets/topic_row.dart';
 
 class ModuleDetailsScreen extends StatelessWidget {
-  final AppState state;
   final String moduleId;
-  const ModuleDetailsScreen({super.key, required this.state, required this.moduleId});
+  const ModuleDetailsScreen({super.key, required this.moduleId});
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<Module>>(
-      valueListenable: state.modulesEx,
-      builder: (_, list, __) {
-        final m = list.firstWhere((e) => e.id == moduleId);
+    return BlocBuilder<AppCubit, AppState>(
+      buildWhen: (previous, current) => previous.modulesEx != current.modulesEx,
+      builder: (context, state) {
+        Module? module;
+        for (final m in state.modulesEx) {
+          if (m.id == moduleId) {
+            module = m;
+            break;
+          }
+        }
+        if (module == null) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: Text('Модуль удалён или не найден')),
+          );
+        }
+        final m = module;
         final progressPercent = (m.progress * 100).toStringAsFixed(0);
 
         return Scaffold(
@@ -43,18 +57,16 @@ class ModuleDetailsScreen extends StatelessWidget {
                 ),
               ),
               _section(
-                context: context,
                 title: 'Теория',
                 items: m.topics,
-                onToggle: (i, v) => state.toggleTopic(moduleId, true, i, v),
-                onDelete: (i) => state.deleteTopic(moduleId, true, i),
+                onToggle: (i, v) => context.read<AppCubit>().toggleTopic(moduleId, true, i, v),
+                onDelete: (i) => context.read<AppCubit>().deleteTopic(moduleId, true, i),
               ),
               _section(
-                context: context,
                 title: 'Практика',
                 items: m.practices,
-                onToggle: (i, v) => state.toggleTopic(moduleId, false, i, v),
-                onDelete: (i) => state.deleteTopic(moduleId, false, i),
+                onToggle: (i, v) => context.read<AppCubit>().toggleTopic(moduleId, false, i, v),
+                onDelete: (i) => context.read<AppCubit>().deleteTopic(moduleId, false, i),
               ),
             ],
           ),
@@ -64,7 +76,6 @@ class ModuleDetailsScreen extends StatelessWidget {
   }
 
   Widget _section({
-    required BuildContext context,
     required String title,
     required List<TopicItem> items,
     required void Function(int index, bool value) onToggle,
@@ -95,18 +106,21 @@ class ModuleDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _rename(BuildContext context, Module m) {
-    final c = TextEditingController(text: m.title);
+  void _rename(BuildContext context, Module module) {
+    final controller = TextEditingController(text: module.title);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Переименовать модуль'),
-        content: TextField(controller: c, decoration: const InputDecoration(labelText: 'Название')),
+        content: TextField(controller: controller, decoration: const InputDecoration(labelText: 'Название')),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           ElevatedButton(
             onPressed: () {
-              if (c.text.trim().isNotEmpty) state.renameModule(m.id, c.text.trim());
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                context.read<AppCubit>().renameModule(module.id, text);
+              }
               Navigator.pop(context);
             },
             child: const Text('Сохранить'),
@@ -117,7 +131,7 @@ class ModuleDetailsScreen extends StatelessWidget {
   }
 
   void _addItem(BuildContext context) {
-    final c = TextEditingController();
+    final controller = TextEditingController();
     bool isTopic = true;
     showDialog(
       context: context,
@@ -126,7 +140,7 @@ class ModuleDetailsScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: c, decoration: const InputDecoration(labelText: 'Название')),
+            TextField(controller: controller, decoration: const InputDecoration(labelText: 'Название')),
             const SizedBox(height: 8),
             DropdownButtonFormField<bool>(
               value: isTopic,
@@ -143,9 +157,9 @@ class ModuleDetailsScreen extends StatelessWidget {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
           ElevatedButton(
             onPressed: () {
-              if (c.text.trim().isEmpty) return;
-              // Делегируем контейнеру состояния
-              state.addTopic(moduleId, isTopic, c.text.trim());
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+              context.read<AppCubit>().addTopic(moduleId, isTopic, text);
               Navigator.pop(context);
             },
             child: const Text('Добавить'),
@@ -155,15 +169,15 @@ class ModuleDetailsScreen extends StatelessWidget {
     );
   }
 
-  String _type(ModuleType t) => switch (t) {
-    ModuleType.lecture => 'лекция',
-    ModuleType.practice => 'практика',
-    ModuleType.lab => 'лабораторная',
-  };
+  String _type(ModuleType type) => switch (type) {
+        ModuleType.lecture => 'лекция',
+        ModuleType.practice => 'практика',
+        ModuleType.lab => 'лабораторная',
+      };
 
-  String _status(ModuleStatus s) => switch (s) {
-    ModuleStatus.notStarted => 'не начат',
-    ModuleStatus.inProgress => 'в процессе',
-    ModuleStatus.completed => 'завершён',
-  };
+  String _status(ModuleStatus status) => switch (status) {
+        ModuleStatus.notStarted => 'не начат',
+        ModuleStatus.inProgress => 'в процессе',
+        ModuleStatus.completed => 'завершён',
+      };
 }

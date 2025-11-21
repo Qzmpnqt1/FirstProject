@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../app/app_state.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final AppState state;
-  const RegisterScreen({super.key, required this.state});
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -32,13 +33,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
     setState(() => loading = true);
-    final ok = await widget.state.register(fullName.text.trim(), em, pw);
+    final ok = await context.read<AppCubit>().register(fullName.text.trim(), em, pw);
+    if (!mounted) return;
     setState(() => loading = false);
-    if (ok && mounted) {
+    if (ok) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Регистрация выполнена, войдите')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Регистрация выполнена, войдите')));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Этот email уже зарегистрирован')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Этот email уже зарегистрирован')));
     }
   }
 
@@ -75,10 +79,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextField(
                     controller: repeat,
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Повтор пароля', border: OutlineInputBorder()),
+                    decoration:
+                        const InputDecoration(labelText: 'Повтор пароля', border: OutlineInputBorder()),
                   ),
                   const SizedBox(height: 12),
-                  ElevatedButton(onPressed: loading ? null : _register, child: Text(loading ? 'Создаём...' : 'Создать аккаунт')),
+                  ElevatedButton(
+                    onPressed: loading ? null : _register,
+                    child: Text(loading ? 'Создаём...' : 'Создать аккаунт'),
+                  ),
                 ],
               ),
             ),

@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../app/app_state.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../app/app_colors.dart';
-import '../data/task.dart';
+import '../app/app_state.dart';
 import '../widgets/task_tile.dart';
 import 'lists/lists_showcase_screen.dart';
 
 class HomePage extends StatefulWidget {
-  final AppState state;
-  const HomePage({super.key, required this.state});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,7 +18,6 @@ class _HomePageState extends State<HomePage> {
   final input = TextEditingController();
   final search = TextEditingController();
 
-  // Плоская иконка ноутбука (Twemoji, PNG)
   static const _homeBannerUrl =
       'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f4bb.png';
 
@@ -33,11 +32,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    input.dispose();
+    search.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
       children: [
-        // Шапка
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -64,18 +69,19 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  ValueListenableBuilder<int>(
-                    valueListenable: widget.state.counter,
-                    builder: (_, v, __) => Chip(
-                      label: Text('Счётчик: $v',
-                          style: const TextStyle(color: Colors.white)),
+                  BlocSelector<AppCubit, AppState, int>(
+                    selector: (state) => state.counter,
+                    builder: (_, value) => Chip(
+                      label: Text(
+                        'Счётчик: $value',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       backgroundColor: Colors.black26,
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
-              // (1) Мини-баннер — «ноутбук/код»
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: SizedBox(
@@ -99,7 +105,6 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 16),
 
-        // Списки витрина (как было)
         Card(
           child: ListTile(
             leading: const Icon(Icons.view_list_rounded, color: AppColors.primary),
@@ -107,16 +112,15 @@ class _HomePageState extends State<HomePage> {
             subtitle: const Text('Три подхода к спискам + добавление/удаление'),
             trailing: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => ListsShowcaseScreen(state: widget.state),
-                ));
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ListsShowcaseScreen()),
+                );
               },
               child: const Text('Открыть'),
             ),
           ),
         ),
 
-        // Поиск
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -129,9 +133,12 @@ class _HomePageState extends State<HomePage> {
                   valueListenable: search,
                   builder: (_, val, __) => val.text.isNotEmpty
                       ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () => search.clear(),
-                  )
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            search.clear();
+                            setState(() {});
+                          },
+                        )
                       : const SizedBox.shrink(),
                 ),
                 border: const OutlineInputBorder(
@@ -143,7 +150,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // Добавление
         Card(
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -159,8 +165,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     onSubmitted: (_) async {
-                      if (input.text.trim().isEmpty) return;
-                      await widget.state.addTask(input.text.trim());
+                      final text = input.text.trim();
+                      if (text.isEmpty) return;
+                      await context.read<AppCubit>().addTask(text);
                       input.clear();
                     },
                   ),
@@ -168,8 +175,9 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: () async {
-                    if (input.text.trim().isEmpty) return;
-                    await widget.state.addTask(input.text.trim());
+                    final text = input.text.trim();
+                    if (text.isEmpty) return;
+                    await context.read<AppCubit>().addTask(text);
                     input.clear();
                   },
                   icon: const Icon(Icons.add_rounded),
@@ -180,14 +188,13 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // Список задач
-        ValueListenableBuilder<List<Task>>(
-          valueListenable: widget.state.tasks,
-          builder: (_, tasks, __) {
+        BlocBuilder<AppCubit, AppState>(
+          buildWhen: (previous, current) => previous.tasks != current.tasks,
+          builder: (_, state) {
+            final tasks = state.tasks;
             final query = search.text.trim().toLowerCase();
-            final filtered = query.isEmpty
-                ? tasks
-                : tasks.where((t) => t.title.toLowerCase().contains(query)).toList();
+            final filtered =
+                query.isEmpty ? tasks : tasks.where((t) => t.title.toLowerCase().contains(query)).toList();
             return Column(
               children: [
                 for (var i = 0; i < filtered.length; i++)
@@ -195,18 +202,18 @@ class _HomePageState extends State<HomePage> {
                     task: filtered[i],
                     onToggle: (v) async {
                       final idx = tasks.indexOf(filtered[i]);
-                      if (idx != -1) await widget.state.toggleTask(idx, v);
+                      if (idx != -1) await context.read<AppCubit>().toggleTask(idx, v);
                     },
                     onDelete: () async {
                       final idx = tasks.indexOf(filtered[i]);
-                      if (idx != -1) await widget.state.deleteTask(idx);
+                      if (idx != -1) await context.read<AppCubit>().deleteTask(idx);
                     },
                   ),
                 if (tasks.any((t) => t.done))
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: OutlinedButton.icon(
-                      onPressed: widget.state.clearDone,
+                      onPressed: () => context.read<AppCubit>().clearDone(),
                       icon: const Icon(Icons.cleaning_services_rounded),
                       label: const Text('Очистить выполненные'),
                     ),
