@@ -90,7 +90,7 @@ class _AppView extends StatelessWidget {
         );
 
         return MaterialApp(
-          title: 'Практическая работа №6. Амерханов К.А. ИКБО-11-22',
+          title: 'Практическая работа №9. Амерханов К.А. ИКБО-11-22',
           theme: light,
           darkTheme: dark,
           themeMode: state.themeDark ? ThemeMode.dark : ThemeMode.light,
