@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'task.dart';
 import 'auth_user.dart';
 import 'module.dart';
+import 'study_session.dart';
 
 class Storage {
   static late SharedPreferences _prefs;
@@ -12,8 +13,12 @@ class Storage {
   static const _kTasks = 'tasks_json';
   static const _kName = 'profile_name';
   static const _kRole = 'profile_role';
+  static const _kGroup = 'profile_group';
+  static const _kGoal = 'profile_goal';
+  static const _kContacts = 'profile_contacts';
   static const _kNotif = 'settings_notifications';
   static const _kAnalyt = 'settings_analytics';
+  static const _kSessions = 'study_sessions_json';
 
   // Старые модули (строки)
   static const _kModules = 'modules_json';
@@ -35,8 +40,14 @@ class Storage {
 
   static String getName() => _prefs.getString(_kName) ?? 'Амерханов Кирилл';
   static String getRole() => _prefs.getString(_kRole) ?? 'Разработчик';
+  static String getProfileGroup() => _prefs.getString(_kGroup) ?? 'ИКБО-00-00';
+  static String getProfileGoal() => _prefs.getString(_kGoal) ?? 'Освоить курс';
+  static String getProfileContacts() => _prefs.getString(_kContacts) ?? 'telegram:@student';
   static Future<void> setName(String v) => _prefs.setString(_kName, v);
   static Future<void> setRole(String v) => _prefs.setString(_kRole, v);
+  static Future<void> setProfileGroup(String v) => _prefs.setString(_kGroup, v);
+  static Future<void> setProfileGoal(String v) => _prefs.setString(_kGoal, v);
+  static Future<void> setProfileContacts(String v) => _prefs.setString(_kContacts, v);
 
   static bool getNotifications() => _prefs.getBool(_kNotif) ?? true;
   static bool getAnalytics() => _prefs.getBool(_kAnalyt) ?? false;
@@ -137,6 +148,49 @@ class Storage {
 
   static Future<void> setModulesEx(List<Module> modules) =>
       _prefs.setString(_kModulesEx, jsonEncode(modules.map((e) => e.toJson()).toList()));
+
+  // --------- Study schedule ----------
+  static List<StudySession> getSessions() {
+    final raw = _prefs.getString(_kSessions);
+    if (raw != null && raw.isNotEmpty) {
+      final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+      return list.map(StudySession.fromJson).toList();
+    }
+    final now = DateTime.now();
+    final defaults = [
+      StudySession(
+        id: 'session_1',
+        title: 'Повторение лекции по Flutter',
+        moduleTitle: 'Основы Flutter и структура проекта',
+        scheduledAt: now.add(const Duration(days: 1, hours: 2)),
+        durationMinutes: 90,
+        completed: false,
+      ),
+      StudySession(
+        id: 'session_2',
+        title: 'Практика по спискам',
+        moduleTitle: 'Списки и работа с состоянием',
+        scheduledAt: now.add(const Duration(days: 2, hours: 3)),
+        durationMinutes: 120,
+        completed: false,
+      ),
+      StudySession(
+        id: 'session_3',
+        title: 'Закрепление SharedPreferences',
+        moduleTitle: 'Персистентность: SharedPreferences',
+        scheduledAt: now.add(const Duration(days: 3, hours: 1)),
+        durationMinutes: 60,
+        completed: false,
+      ),
+    ];
+    setSessions(defaults);
+    return defaults;
+  }
+
+  static Future<void> setSessions(List<StudySession> sessions) => _prefs.setString(
+        _kSessions,
+        jsonEncode(sessions.map((e) => e.toJson()).toList()),
+      );
 
   // --------- Auth ----------
   static AuthUser? getCurrentUser() {

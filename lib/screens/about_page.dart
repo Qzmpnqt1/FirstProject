@@ -57,75 +57,80 @@ class _AboutPageState extends State<AboutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-      children: [
-        Card(
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: CachedNetworkImage(
-                  imageUrl: _aboutUrl,
-                  fit: BoxFit.contain,
-                  placeholder: (_, __) => Container(color: const Color(0xFFE2E8F0)),
-                  errorWidget: (_, __, ___) => const Icon(Icons.apps_rounded, color: AppColors.primary),
+    return Scaffold(
+      appBar: AppBar(title: const Text('О приложении')),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+          children: [
+          Card(
+            child: ListTile(
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CachedNetworkImage(
+                    imageUrl: _aboutUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (_, __) => Container(color: const Color(0xFFE2E8F0)),
+                    errorWidget: (_, __, ___) => const Icon(Icons.apps_rounded, color: AppColors.primary),
+                  ),
                 ),
               ),
-            ),
-            title: const Text('Практическая работа №3'),
-            subtitle: const Text('Демонстрация Stateless/Stateful виджетов и смены контента'),
-            onTap: _easterEggTap,
-          ),
-        ),
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.person_outline_rounded, color: AppColors.primary),
-            title: BlocBuilder<AppCubit, AppState>(
-              buildWhen: (previous, current) =>
-                  previous.name != current.name || previous.role != current.role,
-              builder: (_, state) => Text('${state.name} — ${state.role}'),
-            ),
-            subtitle: const Text('Данные берутся из экрана «Профиль»'),
-          ),
-        ),
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.checklist_rounded, color: AppColors.primary),
-            title: BlocSelector<AppCubit, AppState, MapEntry<int, int>>(
-              selector: (state) {
-                final done = state.tasks.where((t) => t.done).length;
-                return MapEntry(state.tasks.length, done);
-              },
-              builder: (_, stats) => Text('Задач: ${stats.key}, выполнено: ${stats.value}'),
-            ),
-            subtitle: const Text('Статистика синхронизирована с «Главной»'),
-          ),
-        ),
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.timer_rounded, color: AppColors.primary),
-            title: BlocSelector<AppCubit, AppState, int>(
-              selector: (state) => state.counter,
-              builder: (_, value) => Text('Счётчик: $value'),
-            ),
-            subtitle: const Text('Общее значение из вкладки «Счётчик»'),
-          ),
-        ),
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.info_outline_rounded, color: AppColors.primary),
-            title: const Text('Версия'),
-            subtitle: Text(_version),
-            trailing: OutlinedButton(
-              onPressed: _copyVersion,
-              child: const Text('Скопировать'),
+              title: const Text('Практическая работа №3'),
+              subtitle: const Text('Демонстрация Stateless/Stateful виджетов и смены контента'),
+              onTap: _easterEggTap,
             ),
           ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.person_outline_rounded, color: AppColors.primary),
+              title: BlocBuilder<AppCubit, AppState>(
+                buildWhen: (previous, current) =>
+                    previous.name != current.name || previous.role != current.role,
+                builder: (_, state) => Text('${state.name} — ${state.role}'),
+              ),
+              subtitle: const Text('Данные берутся из экрана «Профиль»'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.checklist_rounded, color: AppColors.primary),
+              title: BlocSelector<AppCubit, AppState, MapEntry<int, int>>(
+                selector: (state) {
+                  final done = state.tasks.where((t) => t.done).length;
+                  return MapEntry(state.tasks.length, done);
+                },
+                builder: (_, stats) => Text('Задач: ${stats.key}, выполнено: ${stats.value}'),
+              ),
+              subtitle: const Text('Статистика синхронизирована с «Главной»'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.timer_rounded, color: AppColors.primary),
+              title: BlocSelector<AppCubit, AppState, int>(
+                selector: (state) => state.counter,
+                builder: (_, value) => Text('Счётчик: $value'),
+              ),
+              subtitle: const Text('Общее значение из вкладки «Счётчик»'),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.info_outline_rounded, color: AppColors.primary),
+              title: const Text('Версия'),
+              subtitle: Text(_version),
+              trailing: OutlinedButton(
+                onPressed: _copyVersion,
+                child: const Text('Скопировать'),
+              ),
+            ),
+          ),
+        ],
         ),
-      ],
+      ),
     );
   }
 }

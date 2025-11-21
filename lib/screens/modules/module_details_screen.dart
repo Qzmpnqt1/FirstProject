@@ -46,9 +46,10 @@ class ModuleDetailsScreen extends StatelessWidget {
             icon: const Icon(Icons.add),
             label: const Text('Тема/практика'),
           ),
-          body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-            children: [
+          body: SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              children: [
               Card(
                 child: ListTile(
                   leading: CircularProgressIndicator(value: m.progress),
@@ -68,7 +69,8 @@ class ModuleDetailsScreen extends StatelessWidget {
                 onToggle: (i, v) => context.read<AppCubit>().toggleTopic(moduleId, false, i, v),
                 onDelete: (i) => context.read<AppCubit>().deleteTopic(moduleId, false, i),
               ),
-            ],
+              ],
+            ),
           ),
         );
       },

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/auth_user.dart';
 import '../data/module.dart';
 import '../data/storage.dart';
+import '../data/study_session.dart';
 import '../data/task.dart';
 
 class AppState {
@@ -13,11 +14,15 @@ class AppState {
   final bool analytics;
   final String name;
   final String role;
+  final String group;
+  final String goal;
+  final String contacts;
   final AuthUser? user;
   final int counter;
   final List<Task> tasks;
   final List<String> modules;
   final List<Module> modulesEx;
+  final List<StudySession> sessions;
 
   const AppState({
     required this.themeDark,
@@ -25,11 +30,15 @@ class AppState {
     required this.analytics,
     required this.name,
     required this.role,
+    required this.group,
+    required this.goal,
+    required this.contacts,
     required this.user,
     required this.counter,
     required this.tasks,
     required this.modules,
     required this.modulesEx,
+    required this.sessions,
   });
 
   factory AppState.initial() => AppState(
@@ -38,11 +47,15 @@ class AppState {
         analytics: Storage.getAnalytics(),
         name: Storage.getName(),
         role: Storage.getRole(),
+        group: Storage.getProfileGroup(),
+        goal: Storage.getProfileGoal(),
+        contacts: Storage.getProfileContacts(),
         user: Storage.getCurrentUser(),
         counter: Storage.getCounter(),
         tasks: List.unmodifiable(Storage.getTasks()),
         modules: List.unmodifiable(Storage.getModules()),
         modulesEx: List.unmodifiable(Storage.getModulesEx()),
+        sessions: List.unmodifiable(Storage.getSessions()),
       );
 
   AppState copyWith({
@@ -51,11 +64,15 @@ class AppState {
     bool? analytics,
     String? name,
     String? role,
+    String? group,
+    String? goal,
+    String? contacts,
     AuthUser? user,
     int? counter,
     List<Task>? tasks,
     List<String>? modules,
     List<Module>? modulesEx,
+    List<StudySession>? sessions,
   }) {
     return AppState(
       themeDark: themeDark ?? this.themeDark,
@@ -63,11 +80,15 @@ class AppState {
       analytics: analytics ?? this.analytics,
       name: name ?? this.name,
       role: role ?? this.role,
+      group: group ?? this.group,
+      goal: goal ?? this.goal,
+      contacts: contacts ?? this.contacts,
       user: user ?? this.user,
       counter: counter ?? this.counter,
       tasks: tasks != null ? List.unmodifiable(tasks) : this.tasks,
       modules: modules != null ? List.unmodifiable(modules) : this.modules,
       modulesEx: modulesEx != null ? List.unmodifiable(modulesEx) : this.modulesEx,
+      sessions: sessions != null ? List.unmodifiable(sessions) : this.sessions,
     );
   }
 }
@@ -99,6 +120,21 @@ class AppCubit extends Cubit<AppState> {
   Future<void> setRole(String value) async {
     emit(state.copyWith(role: value));
     await Storage.setRole(value);
+  }
+
+  Future<void> setGroup(String value) async {
+    emit(state.copyWith(group: value));
+    await Storage.setProfileGroup(value);
+  }
+
+  Future<void> setGoal(String value) async {
+    emit(state.copyWith(goal: value));
+    await Storage.setProfileGoal(value);
+  }
+
+  Future<void> setContacts(String value) async {
+    emit(state.copyWith(contacts: value));
+    await Storage.setProfileContacts(value);
   }
 
   // --- счётчик и задачи ---
@@ -230,9 +266,61 @@ class AppCubit extends Cubit<AppState> {
     await Storage.setModulesEx(list);
   }
 
+  // --- расписание ---
+  Future<void> addSession(String title, String moduleTitle, DateTime dateTime, int durationMinutes) async {
+    final session = StudySession(
+      id: DateTime.now().millisecondsSinceEpoch.toString() + Random().nextInt(9999).toString(),
+      title: title,
+      moduleTitle: moduleTitle,
+      scheduledAt: dateTime,
+      durationMinutes: durationMinutes,
+      completed: false,
+    );
+    final list = [session, ...state.sessions]..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    emit(state.copyWith(sessions: list));
+    await Storage.setSessions(list);
+  }
+
+  Future<void> toggleSession(String id, bool value) async {
+    final list = state.sessions
+        .map((s) => s.id == id ? s.copyWith(completed: value) : s)
+        .toList()
+      ..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
+    emit(state.copyWith(sessions: list));
+    await Storage.setSessions(list);
+  }
+
+  Future<void> deleteSession(String id) async {
+    final list = [...state.sessions]..removeWhere((s) => s.id == id);
+    emit(state.copyWith(sessions: list));
+    await Storage.setSessions(list);
+  }
+
   // --- Auth ---
-  Future<bool> register(String fullName, String email, String password) async {
-    return Storage.register(fullName, email, password);
+  Future<bool> register(
+    String fullName,
+    String email,
+    String password, {
+    required String group,
+    required String goal,
+    required String contacts,
+  }) async {
+    final ok = await Storage.register(fullName, email, password);
+    if (ok) {
+      await Storage.setName(fullName.isEmpty ? email : fullName);
+      await Storage.setRole('Студент');
+      await Storage.setProfileGroup(group);
+      await Storage.setProfileGoal(goal);
+      await Storage.setProfileContacts(contacts);
+      emit(state.copyWith(
+        name: fullName.isEmpty ? email : fullName,
+        role: 'Студент',
+        group: group,
+        goal: goal,
+        contacts: contacts,
+      ));
+    }
+    return ok;
   }
 
   Future<bool> login(String email, String password) async {
@@ -244,6 +332,9 @@ class AppCubit extends Cubit<AppState> {
       user: u,
       name: u.fullName,
       role: 'Студент',
+      group: Storage.getProfileGroup(),
+      goal: Storage.getProfileGoal(),
+      contacts: Storage.getProfileContacts(),
     ));
     return true;
   }

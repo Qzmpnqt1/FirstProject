@@ -17,19 +17,21 @@ class ModulesScreen extends StatelessWidget {
         onPressed: () => _createModuleDialog(context),
         child: const Icon(Icons.add),
       ),
-      body: BlocBuilder<AppCubit, AppState>(
-        buildWhen: (previous, current) => previous.modulesEx != current.modulesEx,
-        builder: (_, state) {
-          return ModulesListView(
-            modules: state.modulesEx,
-            onOpen: (m) => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => ModuleDetailsScreen(moduleId: m.id),
+      body: SafeArea(
+        child: BlocBuilder<AppCubit, AppState>(
+          buildWhen: (previous, current) => previous.modulesEx != current.modulesEx,
+          builder: (_, state) {
+            return ModulesListView(
+              modules: state.modulesEx,
+              onOpen: (m) => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ModuleDetailsScreen(moduleId: m.id),
+                ),
               ),
-            ),
-            onDelete: (m) => context.read<AppCubit>().deleteModuleEx(m.id),
-          );
-        },
+              onDelete: (m) => context.read<AppCubit>().deleteModuleEx(m.id),
+            );
+          },
+        ),
       ),
     );
   }
