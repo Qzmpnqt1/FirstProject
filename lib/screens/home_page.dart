@@ -22,60 +22,74 @@ class _HomePageState extends State<HomePage> {
         child: BlocBuilder<AppCubit, AppState>(
           builder: (context, state) {
             final upcoming = _upcomingSessions(state.sessions);
-            final modulesCompleted = state.modulesEx.where((m) => m.progress >= 1).length;
+            final modulesCompleted =
+                state.modulesEx.where((m) => m.progress >= 1).length;
             final tasksDone = state.tasks.where((t) => t.done).length;
+
             return ListView(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
               children: [
-              _HeroCard(counter: state.counter),
-              const SizedBox(height: 16),
-              _SummaryGrid(
-                modulesTotal: state.modulesEx.length,
-                modulesCompleted: modulesCompleted,
-                tasksTotal: state.tasks.length,
-                tasksDone: tasksDone,
-                upcomingSessions: upcoming.length,
-              ),
-              const SizedBox(height: 16),
-              Card(
-                child: ListTile(
-                  leading: const Icon(Icons.view_list_rounded, color: AppColors.primary),
-                  title: const Text('Витрина списков (Column / ListView)'),
-                  subtitle: const Text('Три подхода к отображению данных'),
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const ListsShowcaseScreen()),
-                      );
-                    },
-                    child: const Text('Открыть'),
-                  ),
+                _HeroCard(counter: state.counter),
+                const SizedBox(height: 16),
+                _SummaryGrid(
+                  modulesTotal: state.modulesEx.length,
+                  modulesCompleted: modulesCompleted,
+                  tasksTotal: state.tasks.length,
+                  tasksDone: tasksDone,
+                  upcomingSessions: upcoming.length,
                 ),
-              ),
-              const SizedBox(height: 16),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Ближайшие учебные события', style: Theme.of(context).textTheme.titleMedium),
-                      const SizedBox(height: 12),
-                      if (upcoming.isEmpty)
-                        const Text('Нет запланированных занятий. Перейдите во вкладку «Расписание».')
-                      else
-                        for (final session in upcoming.take(3))
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const Icon(Icons.event_note_rounded),
-                            title: Text(session.title),
-                            subtitle: Text(_formatSession(context, session)),
+                const SizedBox(height: 16),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.view_list_rounded,
+                      color: AppColors.primary,
+                    ),
+                    title: const Text('Витрина списков (Column / ListView)'),
+                    subtitle: const Text('Три подхода к отображению данных'),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ListsShowcaseScreen(),
                           ),
-                    ],
+                        );
+                      },
+                      child: const Text('Открыть'),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ближайшие учебные события',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        if (upcoming.isEmpty)
+                          const Text(
+                            'Нет запланированных занятий. Перейдите во вкладку «Расписание».',
+                          )
+                        else
+                          for (final session in upcoming.take(3))
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading:
+                              const Icon(Icons.event_note_rounded),
+                              title: Text(session.title),
+                              subtitle:
+                              Text(_formatSession(context, session)),
+                            ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             );
           },
         ),
@@ -94,13 +108,17 @@ class _HomePageState extends State<HomePage> {
   String _formatSession(BuildContext context, StudySession session) {
     final l10n = MaterialLocalizations.of(context);
     final date = l10n.formatMediumDate(session.scheduledAt);
-    final time = l10n.formatTimeOfDay(TimeOfDay.fromDateTime(session.scheduledAt), alwaysUse24HourFormat: true);
+    final time = l10n.formatTimeOfDay(
+      TimeOfDay.fromDateTime(session.scheduledAt),
+      alwaysUse24HourFormat: true,
+    );
     return '$date • $time • ${session.moduleTitle}';
   }
 }
 
 class _HeroCard extends StatelessWidget {
   final int counter;
+
   const _HeroCard({required this.counter});
 
   @override
@@ -108,7 +126,9 @@ class _HeroCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark]),
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryDark],
+        ),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(
@@ -116,16 +136,26 @@ class _HeroCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.school_rounded, color: Colors.white, size: 38),
+              const Icon(
+                Icons.school_rounded,
+                color: Colors.white,
+                size: 38,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'План обучения под контролем',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(color: Colors.white),
                 ),
               ),
               Chip(
-                label: Text('Фокус: $counter', style: const TextStyle(color: Colors.white)),
+                label: Text(
+                  'Фокус: $counter',
+                  style: const TextStyle(color: Colors.white),
+                ),
                 backgroundColor: Colors.black26,
               ),
             ],
@@ -143,7 +173,8 @@ class _HeroCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: (counter % 10) / 10,
                 backgroundColor: Colors.white24,
-                valueColor: const AlwaysStoppedAnimation(AppColors.accent),
+                valueColor:
+                const AlwaysStoppedAnimation(AppColors.accent),
               ),
             ),
           ),
@@ -173,49 +204,62 @@ class _SummaryGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
+
         int columns = 4;
         if (width < 720) {
           columns = 1;
         } else if (width < 1080) {
           columns = 2;
         }
-        final aspectRatio = columns >= 4 ? 2.4 : (columns == 2 ? 1.6 : 2.8);
-        return GridView(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: columns,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: aspectRatio,
-          ),
+
+        const spacing = 14.0;
+        final itemWidth =
+            (width - (columns - 1) * spacing) / columns;
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
           children: [
-            _StatCard(
-              icon: Icons.layers_rounded,
-              title: 'Модули',
-              value: '$modulesCompleted / $modulesTotal',
-              subtitle: 'пройдено',
+            SizedBox(
+              width: itemWidth,
+              child: _StatCard(
+                icon: Icons.layers_rounded,
+                title: 'Модули',
+                value: '$modulesCompleted / $modulesTotal',
+                subtitle: 'пройдено',
+              ),
             ),
-            _StatCard(
-              icon: Icons.check_circle_rounded,
-              title: 'Задачи',
-              value: tasksTotal == 0 ? '0%' : '${(tasksDone / tasksTotal * 100).toStringAsFixed(0)}%',
-              subtitle: '$tasksDone из $tasksTotal',
-              color: Colors.teal,
+            SizedBox(
+              width: itemWidth,
+              child: _StatCard(
+                icon: Icons.check_circle_rounded,
+                title: 'Задачи',
+                value: tasksTotal == 0
+                    ? '0%'
+                    : '${(tasksDone / tasksTotal * 100).toStringAsFixed(0)}%',
+                subtitle: '$tasksDone из $tasksTotal',
+                color: Colors.teal,
+              ),
             ),
-            _StatCard(
-              icon: Icons.event_available_rounded,
-              title: 'Расписание',
-              value: '$upcomingSessions',
-              subtitle: 'встреч впереди',
-              color: Colors.deepOrange,
+            SizedBox(
+              width: itemWidth,
+              child: _StatCard(
+                icon: Icons.event_available_rounded,
+                title: 'Расписание',
+                value: '$upcomingSessions',
+                subtitle: 'встреч впереди',
+                color: Colors.deepOrange,
+              ),
             ),
-            _StatCard(
-              icon: Icons.show_chart_rounded,
-              title: 'Активность',
-              value: tasksTotal == 0 ? '--' : '$tasksDone из $tasksTotal',
-              subtitle: 'контроль практики',
-              color: Colors.purple,
+            SizedBox(
+              width: itemWidth,
+              child: _StatCard(
+                icon: Icons.show_chart_rounded,
+                title: 'Активность',
+                value: tasksTotal == 0 ? '--' : '$tasksDone из $tasksTotal',
+                subtitle: 'контроль практики',
+                color: Colors.purple,
+              ),
             ),
           ],
         );
@@ -243,23 +287,45 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min, // <- важно
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
-              radius: 20,
-              backgroundColor: color.withOpacity(0.12),
-              child: Icon(icon, color: color),
+              radius: 18,
+              backgroundColor: color.withOpacity(0.16),
+              child: Icon(icon, color: color, size: 22),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.labelLarge),
-                Text(value, style: Theme.of(context).textTheme.headlineSmall),
-                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-              ],
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(fontSize: 13),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

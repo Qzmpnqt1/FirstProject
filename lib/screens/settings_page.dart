@@ -109,6 +109,11 @@ class SettingsPage extends StatelessWidget {
                 trailing: ElevatedButton(
                   onPressed: () async {
                     await context.read<AppCubit>().logout();
+                    if (!context.mounted) return;
+                    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const AuthGate()),
+                      (_) => false,
+                    );
                   },
                   child: const Text('Выйти'),
                 ),
