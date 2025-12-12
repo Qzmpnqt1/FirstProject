@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../app/app_state.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 
 class AnalyticsPage extends StatelessWidget {
   const AnalyticsPage({super.key});

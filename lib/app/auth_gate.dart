@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../screens/auth/login_screen.dart';
 import '../screens/home_screen.dart';
-import 'app_state.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../app/app_colors.dart';
-import '../data/task.dart';
+import '../domain/entities/task_entity.dart';
 
 class TaskTile extends StatelessWidget {
-  final Task task;
+  final TaskEntity task;
   final ValueChanged<bool> onToggle;
   final VoidCallback onDelete;
   const TaskTile({

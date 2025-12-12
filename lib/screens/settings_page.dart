@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../app/app_colors.dart';
-import '../app/app_state.dart';
 import '../app/auth_gate.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 import '../widgets/settings_header.dart';
 import 'about_page.dart';
 
@@ -30,7 +31,7 @@ class SettingsPage extends StatelessWidget {
             children: [
           const SettingsHeader(),
           BlocSelector<AppCubit, AppState, bool>(
-            selector: (state) => state.themeDark,
+            selector: (state) => state.settings.themeDark,
             builder: (_, isDark) => Card(
               child: SwitchListTile(
                 value: isDark,
@@ -46,7 +47,7 @@ class SettingsPage extends StatelessWidget {
               leading: const Icon(Icons.timer_rounded, color: AppColors.primary),
               title: const Text('Текущее значение счётчика'),
               subtitle: BlocSelector<AppCubit, AppState, int>(
-                selector: (state) => state.counter,
+                selector: (state) => state.settings.counter,
                 builder: (_, value) => Text('Сейчас: $value'),
               ),
               trailing: Wrap(
@@ -72,7 +73,7 @@ class SettingsPage extends StatelessWidget {
           ),
           Card(
             child: SwitchListTile(
-              value: context.select((AppCubit cubit) => cubit.state.notifications),
+              value: context.select((AppCubit cubit) => cubit.state.settings.notifications),
               onChanged: (value) => context.read<AppCubit>().setNotifications(value),
               title: const Text('Уведомления'),
               subtitle: const Text('Учебные напоминания и алерты'),
@@ -81,7 +82,7 @@ class SettingsPage extends StatelessWidget {
           ),
           Card(
             child: SwitchListTile(
-              value: context.select((AppCubit cubit) => cubit.state.analytics),
+              value: context.select((AppCubit cubit) => cubit.state.settings.analytics),
               onChanged: (value) => context.read<AppCubit>().setAnalytics(value),
               title: const Text('Аналитика'),
               subtitle: const Text('Собирать обезличенную статистику'),
@@ -109,11 +110,6 @@ class SettingsPage extends StatelessWidget {
                 trailing: ElevatedButton(
                   onPressed: () async {
                     await context.read<AppCubit>().logout();
-                    if (!context.mounted) return;
-                    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const AuthGate()),
-                      (_) => false,
-                    );
                   },
                   child: const Text('Выйти'),
                 ),

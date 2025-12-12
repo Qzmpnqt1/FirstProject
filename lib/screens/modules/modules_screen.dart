@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../app/app_state.dart';
-import '../../data/module.dart';
+import '../../presentation/bloc/app_cubit.dart';
+import '../../presentation/bloc/app_state.dart';
+import '../../domain/entities/module_entity.dart';
 import '../../widgets/modules_list_view.dart';
 import 'module_details_screen.dart';
 
@@ -23,12 +24,20 @@ class ModulesScreen extends StatelessWidget {
           builder: (_, state) {
             return ModulesListView(
               modules: state.modulesEx,
-              onOpen: (m) => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ModuleDetailsScreen(moduleId: m.id),
-                ),
-              ),
-              onDelete: (m) => context.read<AppCubit>().deleteModuleEx(m.id),
+              onOpen: (m) {
+                if (m.id.isNotEmpty) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ModuleDetailsScreen(moduleId: m.id),
+                    ),
+                  );
+                }
+              },
+              onDelete: (m) {
+                if (m.id.isNotEmpty) {
+                  context.read<AppCubit>().deleteModuleEx(m.id);
+                }
+              },
             );
           },
         ),

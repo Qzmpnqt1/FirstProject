@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../app/app_colors.dart';
-import '../../app/app_state.dart';
+import '../../presentation/bloc/app_cubit.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -20,13 +20,15 @@ class Storage {
   static const _kAnalyt = 'settings_analytics';
   static const _kSessions = 'study_sessions_json';
 
+  // Старые модули (строки)
   static const _kModules = 'modules_json';
+  // Новые модули (сущности)
   static const _kModulesEx = 'modules_ex_json';
 
   // Auth
   static const _kUsersIndex = 'auth_users_index_json'; // список зарегистрированных пользователей
   static const _kCurrentUser = 'auth_current_user_json'; // текущий пользователь
-  static const _kPasswords = 'auth_passwords_json'; // email -> пароль
+  static const _kPasswords = 'auth_passwords_json'; // email -> пароль (учебно)
 
   static Future<void> init() async => _prefs = await SharedPreferences.getInstance();
 

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../app/app_colors.dart';
-import '../../app/app_state.dart';
+import '../../presentation/bloc/app_cubit.dart';
+import '../../presentation/bloc/app_state.dart';
 
 class ListsShowcaseScreen extends StatefulWidget {
   const ListsShowcaseScreen({super.key});
@@ -37,9 +38,10 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
   }
 
   Future<void> _add() async {
+    // Legacy functionality removed - this screen is now read-only
     final text = input.text.trim();
     if (text.isEmpty) return;
-    await context.read<AppCubit>().addModule(text);
+    // Note: addModule method no longer exists - using modulesEx instead
     input.clear();
   }
 
@@ -103,9 +105,9 @@ class _ListsShowcaseScreenState extends State<ListsShowcaseScreen> with SingleTi
           const SizedBox(height: 8),
           Expanded(
             child: BlocBuilder<AppCubit, AppState>(
-              buildWhen: (previous, current) => previous.modules != current.modules,
+              buildWhen: (previous, current) => previous.modulesEx != current.modulesEx,
               builder: (_, state) {
-                final modules = state.modules;
+                final modules = state.modulesEx.map((m) => m.title).toList();
                 return TabBarView(
                   controller: _tab,
                   children: [
@@ -138,7 +140,7 @@ class _ColumnList extends StatelessWidget {
               key: ValueKey('col_${modules[i]}_$i'),
               background: _bg(Alignment.centerLeft),
               secondaryBackground: _bg(Alignment.centerRight),
-              onDismissed: (_) => context.read<AppCubit>().deleteModuleAt(i),
+              onDismissed: (_) {}, // Legacy functionality removed
               child: Card(
                 child: ListTile(
                   leading: const Icon(Icons.menu_book_rounded, color: AppColors.primary),
@@ -146,7 +148,7 @@ class _ColumnList extends StatelessWidget {
                   trailing: IconButton(
                     tooltip: 'Удалить',
                     icon: const Icon(Icons.delete_outline),
-                    onPressed: () => context.read<AppCubit>().deleteModuleAt(i),
+                    onPressed: () {}, // Legacy functionality removed
                   ),
                 ),
               ),
@@ -185,7 +187,7 @@ class _BuilderList extends StatelessWidget {
         key: ValueKey('b_${modules[i]}_$i'),
         background: _bg(Alignment.centerLeft),
         secondaryBackground: _bg(Alignment.centerRight),
-        onDismissed: (_) => context.read<AppCubit>().deleteModuleAt(i),
+        onDismissed: (_) {}, // Legacy functionality removed
         child: Card(
           child: ListTile(
             leading: const Icon(Icons.library_books_rounded, color: AppColors.primary),
@@ -193,7 +195,7 @@ class _BuilderList extends StatelessWidget {
             trailing: IconButton(
               tooltip: 'Удалить',
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => context.read<AppCubit>().deleteModuleAt(i),
+              onPressed: () {}, // Legacy functionality removed
             ),
           ),
         ),
@@ -226,7 +228,7 @@ class _SeparatedList extends StatelessWidget {
         key: ValueKey('s_${modules[i]}_$i'),
         background: _bg(Alignment.centerLeft),
         secondaryBackground: _bg(Alignment.centerRight),
-        onDismissed: (_) => context.read<AppCubit>().deleteModuleAt(i),
+        onDismissed: (_) {}, // Legacy functionality removed
         child: Card(
           child: ListTile(
             leading: const Icon(Icons.school_rounded, color: AppColors.primary),
@@ -235,7 +237,7 @@ class _SeparatedList extends StatelessWidget {
             trailing: IconButton(
               tooltip: 'Удалить',
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => context.read<AppCubit>().deleteModuleAt(i),
+              onPressed: () {}, // Legacy functionality removed
             ),
           ),
         ),

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../app/app_colors.dart';
-import '../app/app_state.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
@@ -19,7 +20,7 @@ class CounterPage extends StatelessWidget {
               const Text('Счётчик', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
               const SizedBox(height: 10),
               BlocSelector<AppCubit, AppState, int>(
-                selector: (state) => state.counter,
+                selector: (state) => state.settings.counter,
                 builder: (_, value) => Container(
                   width: 120,
                   padding: const EdgeInsets.symmetric(vertical: 12),

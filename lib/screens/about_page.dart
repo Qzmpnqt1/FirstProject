@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../app/app_colors.dart';
-import '../app/app_state.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -88,8 +89,8 @@ class _AboutPageState extends State<AboutPage> {
               leading: const Icon(Icons.person_outline_rounded, color: AppColors.primary),
               title: BlocBuilder<AppCubit, AppState>(
                 buildWhen: (previous, current) =>
-                    previous.name != current.name || previous.role != current.role,
-                builder: (_, state) => Text('${state.name} — ${state.role}'),
+                    previous.settings.name != current.settings.name || previous.settings.role != current.settings.role,
+                builder: (_, state) => Text('${state.settings.name} — ${state.settings.role}'),
               ),
               subtitle: const Text('Данные берутся из экрана «Профиль»'),
             ),
@@ -111,7 +112,7 @@ class _AboutPageState extends State<AboutPage> {
             child: ListTile(
               leading: const Icon(Icons.timer_rounded, color: AppColors.primary),
               title: BlocSelector<AppCubit, AppState, int>(
-                selector: (state) => state.counter,
+                selector: (state) => state.settings.counter,
                 builder: (_, value) => Text('Счётчик: $value'),
               ),
               subtitle: const Text('Общее значение из вкладки «Счётчик»'),

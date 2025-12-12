@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'app_colors.dart';
-import 'app_state.dart';
+import '../data/datasources/local_storage_data_source.dart';
+import '../data/repositories/auth_repository_impl.dart';
+import '../data/repositories/modules_repository_impl.dart';
+import '../data/repositories/sessions_repository_impl.dart';
+import '../data/repositories/settings_repository_impl.dart';
+import '../data/repositories/tasks_repository_impl.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 import 'auth_gate.dart';
 
 class MyApp extends StatelessWidget {
@@ -10,8 +17,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Инициализация зависимостей
+    final dataSource = LocalStorageDataSource();
+    final tasksRepository = TasksRepositoryImpl(dataSource);
+    final modulesRepository = ModulesRepositoryImpl(dataSource);
+    final sessionsRepository = SessionsRepositoryImpl(dataSource);
+    final authRepository = AuthRepositoryImpl(dataSource);
+    final settingsRepository = SettingsRepositoryImpl(dataSource);
+
     return BlocProvider(
-      create: (_) => AppCubit(),
+      create: (_) => AppCubit(
+        tasksRepository: tasksRepository,
+        modulesRepository: modulesRepository,
+        sessionsRepository: sessionsRepository,
+        authRepository: authRepository,
+        settingsRepository: settingsRepository,
+      ),
       child: const _AppView(),
     );
   }
@@ -23,7 +44,7 @@ class _AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubit, AppState>(
-      buildWhen: (previous, current) => previous.themeDark != current.themeDark,
+      buildWhen: (previous, current) => previous.settings.themeDark != current.settings.themeDark,
       builder: (context, state) {
         final light = ThemeData(
           colorScheme: ColorScheme.fromSeed(
@@ -90,10 +111,10 @@ class _AppView extends StatelessWidget {
         );
 
         return MaterialApp(
-          title: 'Практическая работа №9. Амерханов К.А. ИКБО-11-22',
+          title: 'Практическая работа №6. Амерханов К.А. ИКБО-11-22',
           theme: light,
           darkTheme: dark,
-          themeMode: state.themeDark ? ThemeMode.dark : ThemeMode.light,
+          themeMode: state.settings.themeDark ? ThemeMode.dark : ThemeMode.light,
           home: const AuthGate(),
         );
       },

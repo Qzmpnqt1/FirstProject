@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../data/module.dart';
+import '../domain/entities/module_entity.dart';
 import '../app/app_colors.dart';
 
 class TopicRow extends StatelessWidget {
-  final TopicItem item;
+  final TopicItemEntity item;
   final ValueChanged<bool> onToggle;
   final VoidCallback onDelete;
 

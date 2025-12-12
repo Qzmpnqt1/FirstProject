@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../data/module.dart';
+import '../domain/entities/module_entity.dart';
 import 'module_tile.dart';
 
 class ModulesListView extends StatelessWidget {
-  final List<Module> modules;
-  final ValueChanged<Module> onOpen;
-  final ValueChanged<Module> onDelete;
+  final List<ModuleEntity> modules;
+  final ValueChanged<ModuleEntity> onOpen;
+  final ValueChanged<ModuleEntity> onDelete;
   final EdgeInsetsGeometry padding;
 
   const ModulesListView({

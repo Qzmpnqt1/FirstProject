@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../app/app_state.dart';
-import '../../data/module.dart';
+import '../../presentation/bloc/app_cubit.dart';
+import '../../presentation/bloc/app_state.dart';
+import '../../domain/entities/module_entity.dart';
 import '../../widgets/topic_row.dart';
 
 class ModuleDetailsScreen extends StatelessWidget {
@@ -14,7 +15,7 @@ class ModuleDetailsScreen extends StatelessWidget {
     return BlocBuilder<AppCubit, AppState>(
       buildWhen: (previous, current) => previous.modulesEx != current.modulesEx,
       builder: (context, state) {
-        Module? module;
+        ModuleEntity? module;
         for (final m in state.modulesEx) {
           if (m.id == moduleId) {
             module = m;
@@ -79,7 +80,7 @@ class ModuleDetailsScreen extends StatelessWidget {
 
   Widget _section({
     required String title,
-    required List<TopicItem> items,
+    required List<TopicItemEntity> items,
     required void Function(int index, bool value) onToggle,
     required void Function(int index) onDelete,
   }) {
@@ -108,7 +109,7 @@ class ModuleDetailsScreen extends StatelessWidget {
     );
   }
 
-  void _rename(BuildContext context, Module module) {
+  void _rename(BuildContext context, ModuleEntity module) {
     final controller = TextEditingController(text: module.title);
     showDialog(
       context: context,

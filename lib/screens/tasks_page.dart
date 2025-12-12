@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../app/app_state.dart';
-import '../data/task.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 import '../widgets/task_tile.dart';
 
 class TasksPage extends StatefulWidget {

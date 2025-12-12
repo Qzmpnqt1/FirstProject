@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../app/app_colors.dart';
-import '../data/module.dart';
+import '../domain/entities/module_entity.dart';
 
 class ModuleTile extends StatelessWidget {
-  final Module module;
+  final ModuleEntity module;
   final VoidCallback onOpen;
   final VoidCallback onDelete;
   final Key? tileKey;

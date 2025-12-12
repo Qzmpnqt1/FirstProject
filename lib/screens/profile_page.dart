@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../app/app_colors.dart';
-import '../app/app_state.dart';
+import '../presentation/bloc/app_cubit.dart';
+import '../presentation/bloc/app_state.dart';
 import '../widgets/profile_chip.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -28,11 +29,11 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     final state = context.read<AppCubit>().state;
-    nameController = TextEditingController(text: state.name);
-    roleController = TextEditingController(text: state.role);
-    groupController = TextEditingController(text: state.group);
-    goalController = TextEditingController(text: state.goal);
-    contactsController = TextEditingController(text: state.contacts);
+    nameController = TextEditingController(text: state.settings.name);
+    roleController = TextEditingController(text: state.settings.role);
+    groupController = TextEditingController(text: state.settings.group);
+    goalController = TextEditingController(text: state.settings.goal);
+    contactsController = TextEditingController(text: state.settings.contacts);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         await precacheImage(CachedNetworkImageProvider(_avatarUrl), context);
@@ -54,9 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final cubit = context.read<AppCubit>();
     await cubit.setName(nameController.text.trim());
     await cubit.setRole(roleController.text.trim());
-    await cubit.setGroup(groupController.text.trim());
-    await cubit.setGoal(goalController.text.trim());
-    await cubit.setContacts(contactsController.text.trim());
+    await cubit.setProfileGroup(groupController.text.trim());
+    await cubit.setProfileGoal(goalController.text.trim());
+    await cubit.setProfileContacts(contactsController.text.trim());
     if (!mounted) return;
     setState(() => edit = false);
     ScaffoldMessenger.of(context)
@@ -82,11 +83,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 child: BlocBuilder<AppCubit, AppState>(
                   buildWhen: (previous, current) =>
-                      previous.name != current.name ||
-                      previous.role != current.role ||
-                      previous.group != current.group ||
-                      previous.goal != current.goal ||
-                      previous.contacts != current.contacts,
+                      previous.settings.name != current.settings.name ||
+                      previous.settings.role != current.settings.role ||
+                      previous.settings.group != current.settings.group ||
+                      previous.settings.goal != current.settings.goal ||
+                      previous.settings.contacts != current.settings.contacts,
                   builder: (context, state) {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
@@ -106,9 +107,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(state.name, style: Theme.of(context).textTheme.titleLarge),
+                                  Text(state.settings.name, style: Theme.of(context).textTheme.titleLarge),
                                   const SizedBox(height: 4),
-                                  Text(state.role, style: Theme.of(context).textTheme.bodyMedium),
+                                  Text(state.settings.role, style: Theme.of(context).textTheme.bodyMedium),
                                 ],
                               ),
                             ),
@@ -119,11 +120,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 setState(() {
                                   edit = !edit;
                                   if (!edit) {
-                                    nameController.text = state.name;
-                                    roleController.text = state.role;
-                                    groupController.text = state.group;
-                                    goalController.text = state.goal;
-                                    contactsController.text = state.contacts;
+                                    nameController.text = state.settings.name;
+                                    roleController.text = state.settings.role;
+                                    groupController.text = state.settings.group;
+                                    goalController.text = state.settings.goal;
+                                    contactsController.text = state.settings.contacts;
                                   }
                                 });
                               },
@@ -151,11 +152,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       onPressed: () {
                                         setState(() {
                                           edit = false;
-                                          nameController.text = state.name;
-                                          roleController.text = state.role;
-                                          groupController.text = state.group;
-                                          goalController.text = state.goal;
-                                          contactsController.text = state.contacts;
+                                          nameController.text = state.settings.name;
+                                          roleController.text = state.settings.role;
+                                          groupController.text = state.settings.group;
+                                          goalController.text = state.settings.goal;
+                                          contactsController.text = state.settings.contacts;
                                         });
                                       },
                                       child: const Text('Отмена'),
@@ -176,11 +177,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _InfoTile(icon: Icons.group_rounded, title: 'Учебная группа', value: state.group),
+                              _InfoTile(icon: Icons.group_rounded, title: 'Учебная группа', value: state.settings.group),
                               _InfoTile(
-                                  icon: Icons.flag_rounded, title: 'Цель обучения', value: state.goal),
+                                  icon: Icons.flag_rounded, title: 'Цель обучения', value: state.settings.goal),
                               _InfoTile(
-                                  icon: Icons.phone_rounded, title: 'Контакты', value: state.contacts),
+                                  icon: Icons.phone_rounded, title: 'Контакты', value: state.settings.contacts),
                             ],
                           ),
                         const SizedBox(height: 20),
