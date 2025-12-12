@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../data/datasources/data_source_interface.dart';
 import 'app_colors.dart';
-import '../data/datasources/local_storage_data_source.dart';
+import '../data/datasources/storage_strategy.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../data/repositories/modules_repository_impl.dart';
 import '../data/repositories/sessions_repository_impl.dart';
@@ -12,18 +13,49 @@ import '../presentation/bloc/app_cubit.dart';
 import '../presentation/bloc/app_state.dart';
 import 'auth_gate.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  DataSourceInterface? _dataSource;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDataSource();
+  }
+
+  Future<void> _initializeDataSource() async {
+    // Можно выбрать тип хранилища через настройки или параметры
+    final strategy = StorageStrategy(StorageStrategy.getDefaultType());
+    final dataSource = await strategy.getDataSource();
+    setState(() {
+      _dataSource = dataSource;
+      _initialized = true;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (!_initialized || _dataSource == null) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
     // Инициализация зависимостей
-    final dataSource = LocalStorageDataSource();
-    final tasksRepository = TasksRepositoryImpl(dataSource);
-    final modulesRepository = ModulesRepositoryImpl(dataSource);
-    final sessionsRepository = SessionsRepositoryImpl(dataSource);
-    final authRepository = AuthRepositoryImpl(dataSource);
-    final settingsRepository = SettingsRepositoryImpl(dataSource);
+    final tasksRepository = TasksRepositoryImpl(_dataSource!);
+    final modulesRepository = ModulesRepositoryImpl(_dataSource!);
+    final sessionsRepository = SessionsRepositoryImpl(_dataSource!);
+    final authRepository = AuthRepositoryImpl(_dataSource!);
+    final settingsRepository = SettingsRepositoryImpl(_dataSource!);
 
     return BlocProvider(
       create: (_) => AppCubit(

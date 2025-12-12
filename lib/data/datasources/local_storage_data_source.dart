@@ -5,9 +5,10 @@ import '../models/task_model.dart';
 import '../models/module_model.dart';
 import '../models/auth_user_model.dart';
 import '../models/study_session_model.dart';
+import 'data_source_interface.dart';
 
 /// Data source для локального хранилища (SharedPreferences)
-class LocalStorageDataSource {
+class LocalStorageDataSource implements DataSourceInterface {
   static late SharedPreferences _prefs;
 
   static const _kDark = 'dark_theme';
@@ -66,10 +67,12 @@ class LocalStorageDataSource {
     return list.map((e) => TaskModel.fromJson(e)).toList();
   }
 
+  @override
   Future<void> setTasks(List<TaskModel> tasks) =>
       _prefs.setString(_kTasks, jsonEncode(tasks.map((e) => e.toJson()).toList()));
 
   // Modules
+  @override
   List<String> getModules() {
     final raw = _prefs.getString(_kModules);
     if (raw == null || raw.isEmpty) {
@@ -84,9 +87,11 @@ class LocalStorageDataSource {
     return (jsonDecode(raw) as List).cast<String>();
   }
 
+  @override
   Future<void> setModules(List<String> modules) =>
       _prefs.setString(_kModules, jsonEncode(modules));
 
+  @override
   List<ModuleModel> getModulesEx() {
     final raw = _prefs.getString(_kModulesEx);
     if (raw != null && raw.isNotEmpty) {
@@ -149,10 +154,12 @@ class LocalStorageDataSource {
     return defaults;
   }
 
+  @override
   Future<void> setModulesEx(List<ModuleModel> modules) =>
       _prefs.setString(_kModulesEx, jsonEncode(modules.map((e) => e.toJson()).toList()));
 
   // Sessions
+  @override
   List<StudySessionModel> getSessions() {
     final raw = _prefs.getString(_kSessions);
     if (raw == null || raw.isEmpty) return [];
@@ -160,23 +167,28 @@ class LocalStorageDataSource {
     return list.map((e) => StudySessionModel.fromJson(e)).toList();
   }
 
+  @override
   Future<void> setSessions(List<StudySessionModel> sessions) =>
       _prefs.setString(_kSessions, jsonEncode(sessions.map((e) => e.toJson()).toList()));
 
   // Auth
+  @override
   AuthUserModel? getCurrentUser() {
     final raw = _prefs.getString(_kCurrentUser);
     if (raw == null || raw.isEmpty) return null;
     return AuthUserModel.fromJson(jsonDecode(raw));
   }
 
-  Future<void> _setCurrentUser(AuthUserModel? u) async {
+  @override
+  Future<void> setCurrentUser(AuthUserModel? u) async {
     if (u == null) {
       await _prefs.remove(_kCurrentUser);
     } else {
       await _prefs.setString(_kCurrentUser, jsonEncode(u.toJson()));
     }
   }
+  
+  Future<void> _setCurrentUser(AuthUserModel? u) async => setCurrentUser(u);
 
   Map<String, String> _getPasswords() {
     final raw = _prefs.getString(_kPasswords);
@@ -197,6 +209,7 @@ class LocalStorageDataSource {
   Future<void> _setUsersIndex(List<AuthUserModel> users) =>
       _prefs.setString(_kUsersIndex, jsonEncode(users.map((e) => e.toJson()).toList()));
 
+  @override
   Future<bool> register(String fullName, String email, String password) async {
     final users = _getUsersIndex();
     if (users.any((u) => u.email.toLowerCase() == email.toLowerCase())) return false;
@@ -209,6 +222,7 @@ class LocalStorageDataSource {
     return true;
   }
 
+  @override
   Future<AuthUserModel?> login(String email, String password) async {
     final pw = _getPasswords();
     final ok = pw[email.toLowerCase()] == password;
@@ -221,6 +235,7 @@ class LocalStorageDataSource {
     return u;
   }
 
-  Future<void> logout() => _setCurrentUser(null);
+  @override
+  Future<void> logout() => setCurrentUser(null);
 }
 

@@ -1,11 +1,11 @@
 import '../../domain/entities/task_entity.dart';
 import '../../domain/repositories/tasks_repository.dart';
-import '../datasources/local_storage_data_source.dart';
+import '../datasources/data_source_interface.dart';
 import '../models/task_model.dart';
 
 /// Реализация репозитория для задач
 class TasksRepositoryImpl implements TasksRepository {
-  final LocalStorageDataSource _dataSource;
+  final DataSourceInterface _dataSource;
 
   TasksRepositoryImpl(this._dataSource);
 

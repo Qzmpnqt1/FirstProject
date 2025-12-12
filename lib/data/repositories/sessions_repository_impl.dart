@@ -1,11 +1,11 @@
 import '../../domain/entities/study_session_entity.dart';
 import '../../domain/repositories/sessions_repository.dart';
-import '../datasources/local_storage_data_source.dart';
+import '../datasources/data_source_interface.dart';
 import '../models/study_session_model.dart';
 
 /// Реализация репозитория для учебных сессий
 class SessionsRepositoryImpl implements SessionsRepository {
-  final LocalStorageDataSource _dataSource;
+  final DataSourceInterface _dataSource;
 
   SessionsRepositoryImpl(this._dataSource);
 

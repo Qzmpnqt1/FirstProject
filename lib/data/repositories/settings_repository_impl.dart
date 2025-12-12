@@ -1,10 +1,10 @@
 import '../../domain/entities/app_settings_entity.dart';
 import '../../domain/repositories/settings_repository.dart';
-import '../datasources/local_storage_data_source.dart';
+import '../datasources/data_source_interface.dart';
 
 /// Реализация репозитория для настроек
 class SettingsRepositoryImpl implements SettingsRepository {
-  final LocalStorageDataSource _dataSource;
+  final DataSourceInterface _dataSource;
 
   SettingsRepositoryImpl(this._dataSource);
 

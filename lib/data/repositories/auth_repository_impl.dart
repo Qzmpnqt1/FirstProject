@@ -1,10 +1,10 @@
 import '../../domain/entities/auth_user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/local_storage_data_source.dart';
+import '../datasources/data_source_interface.dart';
 
 /// Реализация репозитория для аутентификации
 class AuthRepositoryImpl implements AuthRepository {
-  final LocalStorageDataSource _dataSource;
+  final DataSourceInterface _dataSource;
 
   AuthRepositoryImpl(this._dataSource);
 
