@@ -11,9 +11,11 @@ import '../data/repositories/modules_repository_impl.dart';
 import '../data/repositories/sessions_repository_impl.dart';
 import '../data/repositories/settings_repository_impl.dart';
 import '../data/repositories/tasks_repository_impl.dart';
+import '../data/di/network_container.dart';
 import '../presentation/bloc/app_cubit.dart';
 import '../presentation/bloc/app_state.dart';
 import 'auth_gate.dart';
+import 'network_provider.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -29,6 +31,7 @@ class _MyAppState extends State<MyApp> {
   DriftDataSource? _tasksStorage;
   DriftDataSource? _sessionsStorage;
   HiveDataSource? _modulesStorage;
+  NetworkContainer? _networkContainer;
   bool _initialized = false;
 
   @override
@@ -57,12 +60,16 @@ class _MyAppState extends State<MyApp> {
     
     final modulesStorage = HiveDataSource();
     
+    // Инициализация сетевого слоя
+    final networkContainer = NetworkContainer();
+    
     setState(() {
       _settingsStorage = settingsStorage;
       _authStorage = authStorage;
       _tasksStorage = tasksStorage;
       _sessionsStorage = sessionsStorage;
       _modulesStorage = modulesStorage;
+      _networkContainer = networkContainer;
       _initialized = true;
     });
   }
@@ -74,7 +81,8 @@ class _MyAppState extends State<MyApp> {
         _authStorage == null || 
         _tasksStorage == null || 
         _sessionsStorage == null || 
-        _modulesStorage == null) {
+        _modulesStorage == null ||
+        _networkContainer == null) {
       return const MaterialApp(
         home: Scaffold(
           body: Center(child: CircularProgressIndicator()),
@@ -94,15 +102,18 @@ class _MyAppState extends State<MyApp> {
     // Sessions → Drift (SQL)
     final sessionsRepository = SessionsRepositoryImpl(_sessionsStorage!);
 
-    return BlocProvider(
-      create: (_) => AppCubit(
-        tasksRepository: tasksRepository,
-        modulesRepository: modulesRepository,
-        sessionsRepository: sessionsRepository,
-        authRepository: authRepository,
-        settingsRepository: settingsRepository,
+    return NetworkProvider(
+      networkContainer: _networkContainer!,
+      child: BlocProvider(
+        create: (_) => AppCubit(
+          tasksRepository: tasksRepository,
+          modulesRepository: modulesRepository,
+          sessionsRepository: sessionsRepository,
+          authRepository: authRepository,
+          settingsRepository: settingsRepository,
+        ),
+        child: const _AppView(),
       ),
-      child: const _AppView(),
     );
   }
 }

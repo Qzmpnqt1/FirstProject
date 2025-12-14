@@ -142,8 +142,8 @@ class ModuleDetailsScreen extends StatelessWidget {
                 ),
               ),
               if (m.notes != null && m.notes!.isNotEmpty)
-                Card(
-                  child: ListTile(
+              Card(
+                child: ListTile(
                     leading: const Icon(Icons.note_rounded, color: AppColors.primary),
                     title: const Text('Заметки'),
                     subtitle: Text(m.notes!),
@@ -151,8 +151,8 @@ class ModuleDetailsScreen extends StatelessWidget {
                       icon: const Icon(Icons.edit),
                       onPressed: () => _editModuleNotes(context, m),
                     ),
-                  ),
                 ),
+              ),
               _section(
                 title: 'Теория',
                 items: m.topics,
@@ -274,9 +274,9 @@ class ModuleDetailsScreen extends StatelessWidget {
       };
 
   String _status(ModuleStatus status) => switch (status) {
-    ModuleStatus.notStarted => 'не начат',
-    ModuleStatus.inProgress => 'в процессе',
-    ModuleStatus.completed => 'завершён',
+        ModuleStatus.notStarted => 'не начат',
+        ModuleStatus.inProgress => 'в процессе',
+        ModuleStatus.completed => 'завершён',
     // TODO: Handle this case.
     ModuleStatus.paused => throw UnimplementedError(),
   };

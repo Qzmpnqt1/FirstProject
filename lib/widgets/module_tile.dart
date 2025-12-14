@@ -46,8 +46,8 @@ class ModuleTile extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                       Text(
                         module.title,
                         style: const TextStyle(

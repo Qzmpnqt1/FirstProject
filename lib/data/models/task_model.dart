@@ -58,8 +58,8 @@ class TaskModel extends TaskEntity {
     
     return TaskModel(
       id: json['id'] as String? ?? DateTime.now().millisecondsSinceEpoch.toString(),
-      title: json['title'] as String,
-      done: json['done'] as bool? ?? false,
+        title: json['title'] as String,
+        done: json['done'] as bool? ?? false,
       priority: TaskPriority.values.firstWhere(
         (e) => e.name == (json['priority'] as String?),
         orElse: () => TaskPriority.medium,
@@ -80,7 +80,7 @@ class TaskModel extends TaskEntity {
       parentTaskId: json['parentTaskId'] as String?,
       sessionId: json['sessionId'] as String?,
       moduleId: json['moduleId'] as String?,
-    );
+      );
   }
 }
 

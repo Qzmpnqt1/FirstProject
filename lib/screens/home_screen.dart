@@ -6,6 +6,8 @@ import 'profile_page.dart';
 import 'schedule_page.dart';
 import 'settings_page.dart';
 import 'tasks_page.dart';
+import '../app/network_provider.dart';
+import '../presentation/screens/catalog/catalog_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,14 +21,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = const [
-      HomePage(),
-      TasksPage(),
-      ModulesScreen(),
-      SchedulePage(),
-      AnalyticsPage(),
-      ProfilePage(),
-      SettingsPage(),
+    final networkContainer = NetworkProvider.of(context);
+    
+    final pages = [
+      const HomePage(),
+      const TasksPage(),
+      const ModulesScreen(),
+      const SchedulePage(),
+      const AnalyticsPage(),
+      const ProfilePage(),
+      const SettingsPage(),
+      if (networkContainer != null)
+        CatalogPage(
+          searchTopicsUseCase: networkContainer.searchTopicsUseCase,
+          getTopicDetailUseCase: networkContainer.getTopicDetailUseCase,
+          getTopicWorksUseCase: networkContainer.getTopicWorksUseCase,
+          searchBooksUseCase: networkContainer.searchBooksUseCase,
+          getBookDetailUseCase: networkContainer.getBookDetailUseCase,
+        )
+      else
+        const Scaffold(
+          body: Center(
+            child: Text('Сетевой слой не инициализирован'),
+          ),
+        ),
     ];
 
     return Scaffold(
@@ -42,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(icon: Icon(Icons.analytics_rounded), label: 'Аналитика'),
           NavigationDestination(icon: Icon(Icons.person_rounded), label: 'Профиль'),
           NavigationDestination(icon: Icon(Icons.settings_rounded), label: 'Настройки'),
+          NavigationDestination(icon: Icon(Icons.library_books_rounded), label: 'Каталог'),
         ],
       ),
     );

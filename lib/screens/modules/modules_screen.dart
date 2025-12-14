@@ -155,20 +155,20 @@ class _ModulesScreenState extends State<ModulesScreen> {
                 Expanded(
                   child: ModulesListView(
                     modules: filtered,
-                    onOpen: (m) {
-                      if (m.id.isNotEmpty) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => ModuleDetailsScreen(moduleId: m.id),
-                          ),
-                        );
-                      }
-                    },
-                    onDelete: (m) {
-                      if (m.id.isNotEmpty) {
-                        context.read<AppCubit>().deleteModuleEx(m.id);
-                      }
-                    },
+              onOpen: (m) {
+                if (m.id.isNotEmpty) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ModuleDetailsScreen(moduleId: m.id),
+                    ),
+                  );
+                }
+              },
+              onDelete: (m) {
+                if (m.id.isNotEmpty) {
+                  context.read<AppCubit>().deleteModuleEx(m.id);
+                }
+              },
                   ),
                 ),
               ],
@@ -283,33 +283,33 @@ class _ModulesScreenState extends State<ModulesScreen> {
       context: context,
       builder: (_) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Новый модуль'),
+        title: const Text('Новый модуль'),
           content: SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+          mainAxisSize: MainAxisSize.min,
+          children: [
                 TextField(
                   controller: title,
                   decoration: const InputDecoration(labelText: 'Название *'),
                   autofocus: true,
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<ModuleType>(
-                  value: type,
-                  items: const [
-                    DropdownMenuItem(value: ModuleType.lecture, child: Text('Лекция')),
-                    DropdownMenuItem(value: ModuleType.practice, child: Text('Практика')),
-                    DropdownMenuItem(value: ModuleType.lab, child: Text('Лабораторная')),
-                  ],
+            DropdownButtonFormField<ModuleType>(
+              value: type,
+              items: const [
+                DropdownMenuItem(value: ModuleType.lecture, child: Text('Лекция')),
+                DropdownMenuItem(value: ModuleType.practice, child: Text('Практика')),
+                DropdownMenuItem(value: ModuleType.lab, child: Text('Лабораторная')),
+              ],
                   onChanged: (v) => setDialogState(() => type = v ?? ModuleType.lecture),
-                  decoration: const InputDecoration(labelText: 'Тип'),
-                ),
+              decoration: const InputDecoration(labelText: 'Тип'),
+            ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: hours,
-                  keyboardType: TextInputType.number,
+            TextField(
+              controller: hours,
+              keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Часы *'),
-                ),
+            ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<ModulePriority>(
                   value: priority,
@@ -352,13 +352,13 @@ class _ModulesScreenState extends State<ModulesScreen> {
                 ),
               ],
             ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
-            ElevatedButton(
-              onPressed: () {
-                final h = int.tryParse(hours.text) ?? 0;
-                if (title.text.trim().isEmpty || h <= 0) return;
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          ElevatedButton(
+            onPressed: () {
+              final h = int.tryParse(hours.text) ?? 0;
+              if (title.text.trim().isEmpty || h <= 0) return;
                 context.read<AppCubit>().addModuleEx(
                       title.text.trim(),
                       type,
@@ -367,11 +367,11 @@ class _ModulesScreenState extends State<ModulesScreen> {
                       priority: priority,
                       description: description.text.trim().isEmpty ? null : description.text.trim(),
                     );
-                Navigator.pop(context);
-              },
-              child: const Text('Создать'),
-            ),
-          ],
+              Navigator.pop(context);
+            },
+            child: const Text('Создать'),
+          ),
+        ],
         ),
       ),
     );
