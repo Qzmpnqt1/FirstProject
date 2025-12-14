@@ -149,3 +149,4 @@ dart run build_runner build --delete-conflicting-outputs
 - ✅ Все 5 запросов выполняются **реально** через Dio/Retrofit
 - ✅ Результаты отображаются в UI и можно сделать скриншоты для отчета
 
+

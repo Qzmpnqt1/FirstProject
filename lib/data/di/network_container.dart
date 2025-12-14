@@ -66,3 +66,4 @@ class NetworkContainer {
   GetBookDetailUseCase get getBookDetailUseCase => _getBookDetailUseCase;
 }
 
+

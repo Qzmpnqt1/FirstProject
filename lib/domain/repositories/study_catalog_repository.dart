@@ -19,3 +19,4 @@ abstract class StudyCatalogRepository {
   Future<StudyResourceEntity> getBookDetail(String workId);
 }
 
+

@@ -46,3 +46,4 @@ class ServerException implements Exception {
   String toString() => 'ServerException: $message${statusCode != null ? ' (Status: $statusCode)' : ''}';
 }
 
+

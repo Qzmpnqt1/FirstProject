@@ -460,3 +460,4 @@ class _CatalogPageState extends State<CatalogPage> with SingleTickerProviderStat
   }
 }
 
+

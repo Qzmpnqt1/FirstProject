@@ -51,10 +51,12 @@ class BookDocDto {
 @JsonSerializable()
 class WorkDetailDto {
   final String? title;
-  final dynamic description; // Может быть String или Map
+  @JsonKey(fromJson: _descriptionFromJson)
+  final String? description; // Может быть String, Map или List
   final List<String>? subjects;
   @JsonKey(name: 'first_publish_date')
   final String? firstPublishDate;
+  @JsonKey(fromJson: _authorsFromJson)
   final Map<String, dynamic>? authors;
 
   WorkDetailDto({
@@ -65,19 +67,49 @@ class WorkDetailDto {
     this.authors,
   });
 
-  factory WorkDetailDto.fromJson(Map<String, dynamic> json) =>
-      _$WorkDetailDtoFromJson(json);
+  factory WorkDetailDto.fromJson(Map<String, dynamic> json) {
+    // Используем кастомные парсеры для полей, которые могут быть разных типов
+    return WorkDetailDto(
+      title: json['title'] as String?,
+      description: _descriptionFromJson(json['description']),
+      subjects: (json['subjects'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+      firstPublishDate: json['first_publish_date'] as String?,
+      authors: _authorsFromJson(json['authors']),
+    );
+  }
 
   Map<String, dynamic> toJson() => _$WorkDetailDtoToJson(this);
 
   /// Получить описание как строку
-  String? get descriptionText {
-    if (description == null) return null;
-    if (description is String) return description as String;
-    if (description is Map) {
-      return (description as Map)['value'] as String?;
+  String? get descriptionText => description;
+
+  /// Кастомный парсер для description (может быть String, Map или List)
+  static String? _descriptionFromJson(dynamic json) {
+    if (json == null) return null;
+    if (json is String) return json;
+    if (json is Map) {
+      return json['value'] as String?;
     }
-    return description.toString();
+    if (json is List && json.isNotEmpty) {
+      // Если это список, берем первый элемент
+      final first = json.first;
+      if (first is String) return first;
+      if (first is Map) return first['value'] as String?;
+    }
+    return json.toString();
+  }
+
+  /// Кастомный парсер для authors (может быть Map или List)
+  static Map<String, dynamic>? _authorsFromJson(dynamic json) {
+    if (json == null) return null;
+    if (json is Map<String, dynamic>) return json;
+    if (json is List) {
+      // Если это список авторов, преобразуем в Map
+      return {'authors': json};
+    }
+    return null;
   }
 }
 

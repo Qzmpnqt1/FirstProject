@@ -46,12 +46,12 @@ Map<String, dynamic> _$BookDocDtoToJson(BookDocDto instance) =>
 WorkDetailDto _$WorkDetailDtoFromJson(Map<String, dynamic> json) =>
     WorkDetailDto(
       title: json['title'] as String?,
-      description: json['description'],
+      description: WorkDetailDto._descriptionFromJson(json['description']),
       subjects: (json['subjects'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
       firstPublishDate: json['first_publish_date'] as String?,
-      authors: json['authors'] as Map<String, dynamic>?,
+      authors: WorkDetailDto._authorsFromJson(json['authors']),
     );
 
 Map<String, dynamic> _$WorkDetailDtoToJson(WorkDetailDto instance) =>
