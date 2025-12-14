@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/datasources/data_source_interface.dart';
 import 'app_colors.dart';
-import '../data/datasources/storage_strategy.dart';
+import '../data/datasources/local_storage_data_source.dart';
+import '../data/datasources/secure_store_data_source.dart';
+import '../data/datasources/drift_data_source.dart';
+import '../data/datasources/hive_data_source.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../data/repositories/modules_repository_impl.dart';
 import '../data/repositories/sessions_repository_impl.dart';
@@ -21,28 +23,58 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  DataSourceInterface? _dataSource;
+  // Разные хранилища для разных частей приложения
+  LocalStorageDataSource? _settingsStorage;
+  SecureStoreDataSource? _authStorage;
+  DriftDataSource? _tasksStorage;
+  DriftDataSource? _sessionsStorage;
+  HiveDataSource? _modulesStorage;
   bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeDataSource();
+    _initializeStorages();
   }
 
-  Future<void> _initializeDataSource() async {
-    // Можно выбрать тип хранилища через настройки или параметры
-    final strategy = StorageStrategy(StorageStrategy.getDefaultType());
-    final dataSource = await strategy.getDataSource();
+  Future<void> _initializeStorages() async {
+    // Инициализация всех хранилищ
+    await LocalStorageDataSource.init();
+    await SecureStoreDataSource.init();
+    await HiveDataSource.init();
+    
+    // Создание экземпляров хранилищ
+    final settingsStorage = LocalStorageDataSource();
+    final authStorage = SecureStoreDataSource();
+    await authStorage.loadCache();
+    
+    final db = await DriftDataSource.init();
+    final tasksStorage = DriftDataSource(db);
+    await tasksStorage.loadCache();
+    
+    // Используем тот же экземпляр Drift для сессий (можно разделить, если нужно)
+    final sessionsStorage = tasksStorage;
+    
+    final modulesStorage = HiveDataSource();
+    
     setState(() {
-      _dataSource = dataSource;
+      _settingsStorage = settingsStorage;
+      _authStorage = authStorage;
+      _tasksStorage = tasksStorage;
+      _sessionsStorage = sessionsStorage;
+      _modulesStorage = modulesStorage;
       _initialized = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_initialized || _dataSource == null) {
+    if (!_initialized || 
+        _settingsStorage == null || 
+        _authStorage == null || 
+        _tasksStorage == null || 
+        _sessionsStorage == null || 
+        _modulesStorage == null) {
       return const MaterialApp(
         home: Scaffold(
           body: Center(child: CircularProgressIndicator()),
@@ -50,12 +82,17 @@ class _MyAppState extends State<MyApp> {
       );
     }
 
-    // Инициализация зависимостей
-    final tasksRepository = TasksRepositoryImpl(_dataSource!);
-    final modulesRepository = ModulesRepositoryImpl(_dataSource!);
-    final sessionsRepository = SessionsRepositoryImpl(_dataSource!);
-    final authRepository = AuthRepositoryImpl(_dataSource!);
-    final settingsRepository = SettingsRepositoryImpl(_dataSource!);
+    // Инициализация репозиториев с соответствующими хранилищами
+    // Settings → SharedPreferences
+    final settingsRepository = SettingsRepositoryImpl(_settingsStorage!);
+    // Auth → Secure Store
+    final authRepository = AuthRepositoryImpl(_authStorage!);
+    // Tasks → Drift (SQL)
+    final tasksRepository = TasksRepositoryImpl(_tasksStorage!);
+    // Modules → Hive (NoSQL)
+    final modulesRepository = ModulesRepositoryImpl(_modulesStorage!);
+    // Sessions → Drift (SQL)
+    final sessionsRepository = SessionsRepositoryImpl(_sessionsStorage!);
 
     return BlocProvider(
       create: (_) => AppCubit(

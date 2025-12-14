@@ -1,10 +1,11 @@
 import '../../domain/entities/auth_user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../datasources/data_source_interface.dart';
+import '../datasources/secure_store_data_source.dart';
 
 /// Реализация репозитория для аутентификации
+/// Использует Flutter Secure Store для безопасного хранения паролей и токенов
 class AuthRepositoryImpl implements AuthRepository {
-  final DataSourceInterface _dataSource;
+  final SecureStoreDataSource _dataSource;
 
   AuthRepositoryImpl(this._dataSource);
 

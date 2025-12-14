@@ -65,7 +65,7 @@ class AppCubit extends Cubit<AppState> {
       settings: settings,
       user: user,
       tasks: tasks,
-      modules: const [], // legacy, не используется
+      modules: const [],
       modulesEx: modulesEx,
       sessions: sessions,
     ));

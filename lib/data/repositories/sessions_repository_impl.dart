@@ -1,11 +1,12 @@
 import '../../domain/entities/study_session_entity.dart';
 import '../../domain/repositories/sessions_repository.dart';
-import '../datasources/data_source_interface.dart';
+import '../datasources/drift_data_source.dart';
 import '../models/study_session_model.dart';
 
 /// Реализация репозитория для учебных сессий
+/// Использует Drift (SQL) для структурированного хранения сессий
 class SessionsRepositoryImpl implements SessionsRepository {
-  final DataSourceInterface _dataSource;
+  final DriftDataSource _dataSource;
 
   SessionsRepositoryImpl(this._dataSource);
 

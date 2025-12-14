@@ -1,11 +1,12 @@
 import '../../domain/entities/module_entity.dart';
 import '../../domain/repositories/modules_repository.dart';
-import '../datasources/data_source_interface.dart';
+import '../datasources/hive_data_source.dart';
 import '../models/module_model.dart';
 
 /// Реализация репозитория для модулей
+/// Использует Hive (NoSQL) для быстрого доступа к модулям
 class ModulesRepositoryImpl implements ModulesRepository {
-  final DataSourceInterface _dataSource;
+  final HiveDataSource _dataSource;
 
   ModulesRepositoryImpl(this._dataSource);
 

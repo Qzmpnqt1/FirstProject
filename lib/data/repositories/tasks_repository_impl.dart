@@ -1,11 +1,12 @@
 import '../../domain/entities/task_entity.dart';
 import '../../domain/repositories/tasks_repository.dart';
-import '../datasources/data_source_interface.dart';
+import '../datasources/drift_data_source.dart';
 import '../models/task_model.dart';
 
 /// Реализация репозитория для задач
+/// Использует Drift (SQL) для структурированного хранения задач
 class TasksRepositoryImpl implements TasksRepository {
-  final DataSourceInterface _dataSource;
+  final DriftDataSource _dataSource;
 
   TasksRepositoryImpl(this._dataSource);
 
