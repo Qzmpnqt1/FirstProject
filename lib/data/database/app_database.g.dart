@@ -1,5 +1,8 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'app_database.dart';
 
+// ignore_for_file: type=lint
 class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -220,9 +223,13 @@ class $ModulesTable extends Modules with TableInfo<$ModulesTable, Module> {
   $ModulesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> id =
+      GeneratedColumn<String>('id', aliasedName, false,
+          additionalChecks: GeneratedColumn.checkTextLength(
+            minTextLength: 1,
+          ),
+          type: DriftSqlType.string,
+          requiredDuringInsert: true);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -317,7 +324,7 @@ class $ModulesTable extends Modules with TableInfo<$ModulesTable, Module> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Module map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -607,9 +614,13 @@ class $StudySessionsTable extends StudySessions
   $StudySessionsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+  late final GeneratedColumn<String> id =
+      GeneratedColumn<String>('id', aliasedName, false,
+          additionalChecks: GeneratedColumn.checkTextLength(
+            minTextLength: 1,
+          ),
+          type: DriftSqlType.string,
+          requiredDuringInsert: true);
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -643,9 +654,69 @@ class $StudySessionsTable extends StudySessions
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _repeatTypeMeta =
+      const VerificationMeta('repeatType');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, title, moduleTitle, scheduledAt, durationMinutes, completed];
+  late final GeneratedColumn<String> repeatType = GeneratedColumn<String>(
+      'repeat_type', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('none'));
+  static const VerificationMeta _repeatUntilMeta =
+      const VerificationMeta('repeatUntil');
+  @override
+  late final GeneratedColumn<DateTime> repeatUntil = GeneratedColumn<DateTime>(
+      'repeat_until', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _reminderEnabledMeta =
+      const VerificationMeta('reminderEnabled');
+  @override
+  late final GeneratedColumn<bool> reminderEnabled = GeneratedColumn<bool>(
+      'reminder_enabled', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("reminder_enabled" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _reminderMinutesBeforeMeta =
+      const VerificationMeta('reminderMinutesBefore');
+  @override
+  late final GeneratedColumn<int> reminderMinutesBefore = GeneratedColumn<int>(
+      'reminder_minutes_before', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(15));
+  static const VerificationMeta _attendanceMeta =
+      const VerificationMeta('attendance');
+  @override
+  late final GeneratedColumn<String> attendance = GeneratedColumn<String>(
+      'attendance', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('notSet'));
+  static const VerificationMeta _taskIdsJsonMeta =
+      const VerificationMeta('taskIdsJson');
+  @override
+  late final GeneratedColumn<String> taskIdsJson = GeneratedColumn<String>(
+      'task_ids_json', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('[]'));
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        title,
+        moduleTitle,
+        scheduledAt,
+        durationMinutes,
+        completed,
+        repeatType,
+        repeatUntil,
+        reminderEnabled,
+        reminderMinutesBefore,
+        attendance,
+        taskIdsJson
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -695,11 +766,47 @@ class $StudySessionsTable extends StudySessions
       context.handle(_completedMeta,
           completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
     }
+    if (data.containsKey('repeat_type')) {
+      context.handle(
+          _repeatTypeMeta,
+          repeatType.isAcceptableOrUnknown(
+              data['repeat_type']!, _repeatTypeMeta));
+    }
+    if (data.containsKey('repeat_until')) {
+      context.handle(
+          _repeatUntilMeta,
+          repeatUntil.isAcceptableOrUnknown(
+              data['repeat_until']!, _repeatUntilMeta));
+    }
+    if (data.containsKey('reminder_enabled')) {
+      context.handle(
+          _reminderEnabledMeta,
+          reminderEnabled.isAcceptableOrUnknown(
+              data['reminder_enabled']!, _reminderEnabledMeta));
+    }
+    if (data.containsKey('reminder_minutes_before')) {
+      context.handle(
+          _reminderMinutesBeforeMeta,
+          reminderMinutesBefore.isAcceptableOrUnknown(
+              data['reminder_minutes_before']!, _reminderMinutesBeforeMeta));
+    }
+    if (data.containsKey('attendance')) {
+      context.handle(
+          _attendanceMeta,
+          attendance.isAcceptableOrUnknown(
+              data['attendance']!, _attendanceMeta));
+    }
+    if (data.containsKey('task_ids_json')) {
+      context.handle(
+          _taskIdsJsonMeta,
+          taskIdsJson.isAcceptableOrUnknown(
+              data['task_ids_json']!, _taskIdsJsonMeta));
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   StudySession map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -716,6 +823,18 @@ class $StudySessionsTable extends StudySessions
           .read(DriftSqlType.int, data['${effectivePrefix}duration_minutes'])!,
       completed: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
+      repeatType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}repeat_type'])!,
+      repeatUntil: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}repeat_until']),
+      reminderEnabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}reminder_enabled'])!,
+      reminderMinutesBefore: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}reminder_minutes_before'])!,
+      attendance: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}attendance'])!,
+      taskIdsJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}task_ids_json'])!,
     );
   }
 
@@ -732,13 +851,25 @@ class StudySession extends DataClass implements Insertable<StudySession> {
   final DateTime scheduledAt;
   final int durationMinutes;
   final bool completed;
+  final String repeatType;
+  final DateTime? repeatUntil;
+  final bool reminderEnabled;
+  final int reminderMinutesBefore;
+  final String attendance;
+  final String taskIdsJson;
   const StudySession(
       {required this.id,
       required this.title,
       required this.moduleTitle,
       required this.scheduledAt,
       required this.durationMinutes,
-      required this.completed});
+      required this.completed,
+      required this.repeatType,
+      this.repeatUntil,
+      required this.reminderEnabled,
+      required this.reminderMinutesBefore,
+      required this.attendance,
+      required this.taskIdsJson});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -748,6 +879,14 @@ class StudySession extends DataClass implements Insertable<StudySession> {
     map['scheduled_at'] = Variable<DateTime>(scheduledAt);
     map['duration_minutes'] = Variable<int>(durationMinutes);
     map['completed'] = Variable<bool>(completed);
+    map['repeat_type'] = Variable<String>(repeatType);
+    if (!nullToAbsent || repeatUntil != null) {
+      map['repeat_until'] = Variable<DateTime>(repeatUntil);
+    }
+    map['reminder_enabled'] = Variable<bool>(reminderEnabled);
+    map['reminder_minutes_before'] = Variable<int>(reminderMinutesBefore);
+    map['attendance'] = Variable<String>(attendance);
+    map['task_ids_json'] = Variable<String>(taskIdsJson);
     return map;
   }
 
@@ -759,6 +898,14 @@ class StudySession extends DataClass implements Insertable<StudySession> {
       scheduledAt: Value(scheduledAt),
       durationMinutes: Value(durationMinutes),
       completed: Value(completed),
+      repeatType: Value(repeatType),
+      repeatUntil: repeatUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repeatUntil),
+      reminderEnabled: Value(reminderEnabled),
+      reminderMinutesBefore: Value(reminderMinutesBefore),
+      attendance: Value(attendance),
+      taskIdsJson: Value(taskIdsJson),
     );
   }
 
@@ -772,6 +919,13 @@ class StudySession extends DataClass implements Insertable<StudySession> {
       scheduledAt: serializer.fromJson<DateTime>(json['scheduledAt']),
       durationMinutes: serializer.fromJson<int>(json['durationMinutes']),
       completed: serializer.fromJson<bool>(json['completed']),
+      repeatType: serializer.fromJson<String>(json['repeatType']),
+      repeatUntil: serializer.fromJson<DateTime?>(json['repeatUntil']),
+      reminderEnabled: serializer.fromJson<bool>(json['reminderEnabled']),
+      reminderMinutesBefore:
+          serializer.fromJson<int>(json['reminderMinutesBefore']),
+      attendance: serializer.fromJson<String>(json['attendance']),
+      taskIdsJson: serializer.fromJson<String>(json['taskIdsJson']),
     );
   }
   @override
@@ -784,6 +938,12 @@ class StudySession extends DataClass implements Insertable<StudySession> {
       'scheduledAt': serializer.toJson<DateTime>(scheduledAt),
       'durationMinutes': serializer.toJson<int>(durationMinutes),
       'completed': serializer.toJson<bool>(completed),
+      'repeatType': serializer.toJson<String>(repeatType),
+      'repeatUntil': serializer.toJson<DateTime?>(repeatUntil),
+      'reminderEnabled': serializer.toJson<bool>(reminderEnabled),
+      'reminderMinutesBefore': serializer.toJson<int>(reminderMinutesBefore),
+      'attendance': serializer.toJson<String>(attendance),
+      'taskIdsJson': serializer.toJson<String>(taskIdsJson),
     };
   }
 
@@ -793,7 +953,13 @@ class StudySession extends DataClass implements Insertable<StudySession> {
           String? moduleTitle,
           DateTime? scheduledAt,
           int? durationMinutes,
-          bool? completed}) =>
+          bool? completed,
+          String? repeatType,
+          Value<DateTime?> repeatUntil = const Value.absent(),
+          bool? reminderEnabled,
+          int? reminderMinutesBefore,
+          String? attendance,
+          String? taskIdsJson}) =>
       StudySession(
         id: id ?? this.id,
         title: title ?? this.title,
@@ -801,6 +967,13 @@ class StudySession extends DataClass implements Insertable<StudySession> {
         scheduledAt: scheduledAt ?? this.scheduledAt,
         durationMinutes: durationMinutes ?? this.durationMinutes,
         completed: completed ?? this.completed,
+        repeatType: repeatType ?? this.repeatType,
+        repeatUntil: repeatUntil.present ? repeatUntil.value : this.repeatUntil,
+        reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+        reminderMinutesBefore:
+            reminderMinutesBefore ?? this.reminderMinutesBefore,
+        attendance: attendance ?? this.attendance,
+        taskIdsJson: taskIdsJson ?? this.taskIdsJson,
       );
   StudySession copyWithCompanion(StudySessionsCompanion data) {
     return StudySession(
@@ -814,6 +987,20 @@ class StudySession extends DataClass implements Insertable<StudySession> {
           ? data.durationMinutes.value
           : this.durationMinutes,
       completed: data.completed.present ? data.completed.value : this.completed,
+      repeatType:
+          data.repeatType.present ? data.repeatType.value : this.repeatType,
+      repeatUntil:
+          data.repeatUntil.present ? data.repeatUntil.value : this.repeatUntil,
+      reminderEnabled: data.reminderEnabled.present
+          ? data.reminderEnabled.value
+          : this.reminderEnabled,
+      reminderMinutesBefore: data.reminderMinutesBefore.present
+          ? data.reminderMinutesBefore.value
+          : this.reminderMinutesBefore,
+      attendance:
+          data.attendance.present ? data.attendance.value : this.attendance,
+      taskIdsJson:
+          data.taskIdsJson.present ? data.taskIdsJson.value : this.taskIdsJson,
     );
   }
 
@@ -825,14 +1012,31 @@ class StudySession extends DataClass implements Insertable<StudySession> {
           ..write('moduleTitle: $moduleTitle, ')
           ..write('scheduledAt: $scheduledAt, ')
           ..write('durationMinutes: $durationMinutes, ')
-          ..write('completed: $completed')
+          ..write('completed: $completed, ')
+          ..write('repeatType: $repeatType, ')
+          ..write('repeatUntil: $repeatUntil, ')
+          ..write('reminderEnabled: $reminderEnabled, ')
+          ..write('reminderMinutesBefore: $reminderMinutesBefore, ')
+          ..write('attendance: $attendance, ')
+          ..write('taskIdsJson: $taskIdsJson')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(
-      id, title, moduleTitle, scheduledAt, durationMinutes, completed);
+      id,
+      title,
+      moduleTitle,
+      scheduledAt,
+      durationMinutes,
+      completed,
+      repeatType,
+      repeatUntil,
+      reminderEnabled,
+      reminderMinutesBefore,
+      attendance,
+      taskIdsJson);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -842,7 +1046,13 @@ class StudySession extends DataClass implements Insertable<StudySession> {
           other.moduleTitle == this.moduleTitle &&
           other.scheduledAt == this.scheduledAt &&
           other.durationMinutes == this.durationMinutes &&
-          other.completed == this.completed);
+          other.completed == this.completed &&
+          other.repeatType == this.repeatType &&
+          other.repeatUntil == this.repeatUntil &&
+          other.reminderEnabled == this.reminderEnabled &&
+          other.reminderMinutesBefore == this.reminderMinutesBefore &&
+          other.attendance == this.attendance &&
+          other.taskIdsJson == this.taskIdsJson);
 }
 
 class StudySessionsCompanion extends UpdateCompanion<StudySession> {
@@ -852,6 +1062,12 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
   final Value<DateTime> scheduledAt;
   final Value<int> durationMinutes;
   final Value<bool> completed;
+  final Value<String> repeatType;
+  final Value<DateTime?> repeatUntil;
+  final Value<bool> reminderEnabled;
+  final Value<int> reminderMinutesBefore;
+  final Value<String> attendance;
+  final Value<String> taskIdsJson;
   final Value<int> rowid;
   const StudySessionsCompanion({
     this.id = const Value.absent(),
@@ -860,6 +1076,12 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
     this.scheduledAt = const Value.absent(),
     this.durationMinutes = const Value.absent(),
     this.completed = const Value.absent(),
+    this.repeatType = const Value.absent(),
+    this.repeatUntil = const Value.absent(),
+    this.reminderEnabled = const Value.absent(),
+    this.reminderMinutesBefore = const Value.absent(),
+    this.attendance = const Value.absent(),
+    this.taskIdsJson = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   StudySessionsCompanion.insert({
@@ -869,6 +1091,12 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
     required DateTime scheduledAt,
     required int durationMinutes,
     this.completed = const Value.absent(),
+    this.repeatType = const Value.absent(),
+    this.repeatUntil = const Value.absent(),
+    this.reminderEnabled = const Value.absent(),
+    this.reminderMinutesBefore = const Value.absent(),
+    this.attendance = const Value.absent(),
+    this.taskIdsJson = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         title = Value(title),
@@ -882,6 +1110,12 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
     Expression<DateTime>? scheduledAt,
     Expression<int>? durationMinutes,
     Expression<bool>? completed,
+    Expression<String>? repeatType,
+    Expression<DateTime>? repeatUntil,
+    Expression<bool>? reminderEnabled,
+    Expression<int>? reminderMinutesBefore,
+    Expression<String>? attendance,
+    Expression<String>? taskIdsJson,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -891,6 +1125,13 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
       if (scheduledAt != null) 'scheduled_at': scheduledAt,
       if (durationMinutes != null) 'duration_minutes': durationMinutes,
       if (completed != null) 'completed': completed,
+      if (repeatType != null) 'repeat_type': repeatType,
+      if (repeatUntil != null) 'repeat_until': repeatUntil,
+      if (reminderEnabled != null) 'reminder_enabled': reminderEnabled,
+      if (reminderMinutesBefore != null)
+        'reminder_minutes_before': reminderMinutesBefore,
+      if (attendance != null) 'attendance': attendance,
+      if (taskIdsJson != null) 'task_ids_json': taskIdsJson,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -902,6 +1143,12 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
       Value<DateTime>? scheduledAt,
       Value<int>? durationMinutes,
       Value<bool>? completed,
+      Value<String>? repeatType,
+      Value<DateTime?>? repeatUntil,
+      Value<bool>? reminderEnabled,
+      Value<int>? reminderMinutesBefore,
+      Value<String>? attendance,
+      Value<String>? taskIdsJson,
       Value<int>? rowid}) {
     return StudySessionsCompanion(
       id: id ?? this.id,
@@ -910,6 +1157,13 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
       scheduledAt: scheduledAt ?? this.scheduledAt,
       durationMinutes: durationMinutes ?? this.durationMinutes,
       completed: completed ?? this.completed,
+      repeatType: repeatType ?? this.repeatType,
+      repeatUntil: repeatUntil ?? this.repeatUntil,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderMinutesBefore:
+          reminderMinutesBefore ?? this.reminderMinutesBefore,
+      attendance: attendance ?? this.attendance,
+      taskIdsJson: taskIdsJson ?? this.taskIdsJson,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -935,6 +1189,25 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
     if (completed.present) {
       map['completed'] = Variable<bool>(completed.value);
     }
+    if (repeatType.present) {
+      map['repeat_type'] = Variable<String>(repeatType.value);
+    }
+    if (repeatUntil.present) {
+      map['repeat_until'] = Variable<DateTime>(repeatUntil.value);
+    }
+    if (reminderEnabled.present) {
+      map['reminder_enabled'] = Variable<bool>(reminderEnabled.value);
+    }
+    if (reminderMinutesBefore.present) {
+      map['reminder_minutes_before'] =
+          Variable<int>(reminderMinutesBefore.value);
+    }
+    if (attendance.present) {
+      map['attendance'] = Variable<String>(attendance.value);
+    }
+    if (taskIdsJson.present) {
+      map['task_ids_json'] = Variable<String>(taskIdsJson.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -950,6 +1223,12 @@ class StudySessionsCompanion extends UpdateCompanion<StudySession> {
           ..write('scheduledAt: $scheduledAt, ')
           ..write('durationMinutes: $durationMinutes, ')
           ..write('completed: $completed, ')
+          ..write('repeatType: $repeatType, ')
+          ..write('repeatUntil: $repeatUntil, ')
+          ..write('reminderEnabled: $reminderEnabled, ')
+          ..write('reminderMinutesBefore: $reminderMinutesBefore, ')
+          ..write('attendance: $attendance, ')
+          ..write('taskIdsJson: $taskIdsJson, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1001,7 +1280,7 @@ class $AuthUsersTable extends AuthUsers
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {email};
   @override
   AuthUser map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1192,7 +1471,7 @@ class $PasswordsTable extends Passwords
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {email};
   @override
   Password map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1901,6 +2180,12 @@ typedef $$StudySessionsTableCreateCompanionBuilder = StudySessionsCompanion
   required DateTime scheduledAt,
   required int durationMinutes,
   Value<bool> completed,
+  Value<String> repeatType,
+  Value<DateTime?> repeatUntil,
+  Value<bool> reminderEnabled,
+  Value<int> reminderMinutesBefore,
+  Value<String> attendance,
+  Value<String> taskIdsJson,
   Value<int> rowid,
 });
 typedef $$StudySessionsTableUpdateCompanionBuilder = StudySessionsCompanion
@@ -1911,6 +2196,12 @@ typedef $$StudySessionsTableUpdateCompanionBuilder = StudySessionsCompanion
   Value<DateTime> scheduledAt,
   Value<int> durationMinutes,
   Value<bool> completed,
+  Value<String> repeatType,
+  Value<DateTime?> repeatUntil,
+  Value<bool> reminderEnabled,
+  Value<int> reminderMinutesBefore,
+  Value<String> attendance,
+  Value<String> taskIdsJson,
   Value<int> rowid,
 });
 
@@ -1941,6 +2232,26 @@ class $$StudySessionsTableFilterComposer
 
   ColumnFilters<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get repeatType => $composableBuilder(
+      column: $table.repeatType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get repeatUntil => $composableBuilder(
+      column: $table.repeatUntil, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get reminderEnabled => $composableBuilder(
+      column: $table.reminderEnabled,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get reminderMinutesBefore => $composableBuilder(
+      column: $table.reminderMinutesBefore,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get attendance => $composableBuilder(
+      column: $table.attendance, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get taskIdsJson => $composableBuilder(
+      column: $table.taskIdsJson, builder: (column) => ColumnFilters(column));
 }
 
 class $$StudySessionsTableOrderingComposer
@@ -1970,6 +2281,26 @@ class $$StudySessionsTableOrderingComposer
 
   ColumnOrderings<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get repeatType => $composableBuilder(
+      column: $table.repeatType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get repeatUntil => $composableBuilder(
+      column: $table.repeatUntil, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get reminderEnabled => $composableBuilder(
+      column: $table.reminderEnabled,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get reminderMinutesBefore => $composableBuilder(
+      column: $table.reminderMinutesBefore,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get attendance => $composableBuilder(
+      column: $table.attendance, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get taskIdsJson => $composableBuilder(
+      column: $table.taskIdsJson, builder: (column) => ColumnOrderings(column));
 }
 
 class $$StudySessionsTableAnnotationComposer
@@ -1998,6 +2329,24 @@ class $$StudySessionsTableAnnotationComposer
 
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<String> get repeatType => $composableBuilder(
+      column: $table.repeatType, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get repeatUntil => $composableBuilder(
+      column: $table.repeatUntil, builder: (column) => column);
+
+  GeneratedColumn<bool> get reminderEnabled => $composableBuilder(
+      column: $table.reminderEnabled, builder: (column) => column);
+
+  GeneratedColumn<int> get reminderMinutesBefore => $composableBuilder(
+      column: $table.reminderMinutesBefore, builder: (column) => column);
+
+  GeneratedColumn<String> get attendance => $composableBuilder(
+      column: $table.attendance, builder: (column) => column);
+
+  GeneratedColumn<String> get taskIdsJson => $composableBuilder(
+      column: $table.taskIdsJson, builder: (column) => column);
 }
 
 class $$StudySessionsTableTableManager extends RootTableManager<
@@ -2032,6 +2381,12 @@ class $$StudySessionsTableTableManager extends RootTableManager<
             Value<DateTime> scheduledAt = const Value.absent(),
             Value<int> durationMinutes = const Value.absent(),
             Value<bool> completed = const Value.absent(),
+            Value<String> repeatType = const Value.absent(),
+            Value<DateTime?> repeatUntil = const Value.absent(),
+            Value<bool> reminderEnabled = const Value.absent(),
+            Value<int> reminderMinutesBefore = const Value.absent(),
+            Value<String> attendance = const Value.absent(),
+            Value<String> taskIdsJson = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               StudySessionsCompanion(
@@ -2041,6 +2396,12 @@ class $$StudySessionsTableTableManager extends RootTableManager<
             scheduledAt: scheduledAt,
             durationMinutes: durationMinutes,
             completed: completed,
+            repeatType: repeatType,
+            repeatUntil: repeatUntil,
+            reminderEnabled: reminderEnabled,
+            reminderMinutesBefore: reminderMinutesBefore,
+            attendance: attendance,
+            taskIdsJson: taskIdsJson,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2050,6 +2411,12 @@ class $$StudySessionsTableTableManager extends RootTableManager<
             required DateTime scheduledAt,
             required int durationMinutes,
             Value<bool> completed = const Value.absent(),
+            Value<String> repeatType = const Value.absent(),
+            Value<DateTime?> repeatUntil = const Value.absent(),
+            Value<bool> reminderEnabled = const Value.absent(),
+            Value<int> reminderMinutesBefore = const Value.absent(),
+            Value<String> attendance = const Value.absent(),
+            Value<String> taskIdsJson = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               StudySessionsCompanion.insert(
@@ -2059,6 +2426,12 @@ class $$StudySessionsTableTableManager extends RootTableManager<
             scheduledAt: scheduledAt,
             durationMinutes: durationMinutes,
             completed: completed,
+            repeatType: repeatType,
+            repeatUntil: repeatUntil,
+            reminderEnabled: reminderEnabled,
+            reminderMinutesBefore: reminderMinutesBefore,
+            attendance: attendance,
+            taskIdsJson: taskIdsJson,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

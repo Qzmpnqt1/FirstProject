@@ -18,10 +18,8 @@ class HiveDataSource implements DataSourceInterface {
 
   static Future<void> init() async {
     await Hive.initFlutter();
-    
-    // Регистрация адаптеров (если нужны)
+
     if (!Hive.isAdapterRegistered(0)) {
-      // Можно зарегистрировать адаптеры для моделей
     }
     
     // Открытие боксов

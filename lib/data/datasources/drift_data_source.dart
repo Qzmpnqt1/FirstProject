@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import '../../domain/entities/module_entity.dart';
+import '../../domain/entities/study_session_entity.dart';
 import '../models/task_model.dart';
 import '../models/module_model.dart';
 import '../models/auth_user_model.dart';
@@ -121,14 +122,34 @@ class DriftDataSource implements DataSourceInterface {
     }
     
     final sessions = await _db.getAllSessions();
-    _sessionsCache = sessions.map((s) => StudySessionModel(
-      id: s.id,
-      title: s.title,
-      moduleTitle: s.moduleTitle,
-      scheduledAt: s.scheduledAt,
-      durationMinutes: s.durationMinutes,
-      completed: s.completed,
-    )).toList();
+    _sessionsCache = sessions.map((s) {
+      // Временно используем только базовые поля до регенерации кода Drift
+      // После регенерации добавим чтение новых полей: repeatType, repeatUntil, 
+      // reminderEnabled, reminderMinutesBefore, attendance, taskIdsJson
+      return StudySessionModel(
+        id: s.id,
+        title: s.title,
+        moduleTitle: s.moduleTitle,
+        scheduledAt: s.scheduledAt,
+        durationMinutes: s.durationMinutes,
+        completed: s.completed,
+        // TODO: Раскомментировать после регенерации кода Drift
+        // repeatType: SessionRepeatType.values.firstWhere(
+        //   (e) => e.name == (s.repeatType ?? 'none'),
+        //   orElse: () => SessionRepeatType.none,
+        // ),
+        // repeatUntil: s.repeatUntil,
+        // reminderEnabled: s.reminderEnabled ?? false,
+        // reminderMinutesBefore: s.reminderMinutesBefore ?? 15,
+        // attendance: AttendanceStatus.values.firstWhere(
+        //   (e) => e.name == (s.attendance ?? 'notSet'),
+        //   orElse: () => AttendanceStatus.notSet,
+        // ),
+        // taskIds: s.taskIdsJson != null && s.taskIdsJson!.isNotEmpty
+        //     ? (jsonDecode(s.taskIdsJson!) as List<dynamic>).cast<String>()
+        //     : <String>[],
+      );
+    }).toList();
     
     final user = await _db.getCurrentUser();
     _currentUserCache = user != null ? AuthUserModel(email: user.email, fullName: user.fullName) : null;
@@ -313,7 +334,10 @@ class DriftDataSource implements DataSourceInterface {
 
   @override
   Future<void> setSessions(List<StudySessionModel> sessions) async {
+    // Удаляем все существующие сессии
     await _db.deleteAllSessions();
+    
+    // Сохраняем новые сессии
     for (final session in sessions) {
       await _db.insertSession(StudySessionsCompanion.insert(
         id: session.id,
@@ -322,8 +346,17 @@ class DriftDataSource implements DataSourceInterface {
         scheduledAt: session.scheduledAt,
         durationMinutes: session.durationMinutes,
         completed: Value(session.completed),
+        // TODO: Раскомментировать после регенерации кода Drift
+        // repeatType: Value(session.repeatType.name),
+        // repeatUntil: Value(session.repeatUntil),
+        // reminderEnabled: Value(session.reminderEnabled),
+        // reminderMinutesBefore: Value(session.reminderMinutesBefore),
+        // attendance: Value(session.attendance.name),
+        // taskIdsJson: Value(jsonEncode(session.taskIds)),
       ));
     }
+    
+    // Обновляем кэш после сохранения
     _sessionsCache = sessions;
   }
 
