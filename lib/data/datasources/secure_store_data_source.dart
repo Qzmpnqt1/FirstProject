@@ -87,7 +87,7 @@ class SecureStoreDataSource implements DataSourceInterface {
     final modulesExRaw = await _storage.read(key: _kModulesEx);
     if (modulesExRaw == null || modulesExRaw.isEmpty) {
       _modulesExCache = [
-        const ModuleModel(
+        ModuleModel(
           id: 'm1',
           title: 'Основы Flutter и структура проекта',
           type: ModuleType.lecture,
@@ -99,6 +99,7 @@ class SecureStoreDataSource implements DataSourceInterface {
             TopicItemModel(title: 'Навигация'),
           ],
           practices: [TopicItemModel(title: 'Собрать экран профиля')],
+          createdAt: DateTime.now(),
         ),
       ];
       setModulesEx(_modulesExCache!);

@@ -67,7 +67,7 @@ class DriftDataSource implements DataSourceInterface {
     final modules = await _db.getAllModules();
     if (modules.isEmpty) {
       _modulesExCache = [
-        const ModuleModel(
+        ModuleModel(
           id: 'm1',
           title: 'Основы Flutter и структура проекта',
           type: ModuleType.lecture,
@@ -79,6 +79,7 @@ class DriftDataSource implements DataSourceInterface {
             TopicItemModel(title: 'Навигация'),
           ],
           practices: [TopicItemModel(title: 'Собрать экран профиля')],
+          createdAt: DateTime.now(),
         ),
       ];
       setModulesEx(_modulesExCache!);
@@ -94,6 +95,7 @@ class DriftDataSource implements DataSourceInterface {
           status: ModuleStatus.values.firstWhere((e) => e.name == m.status),
           topics: topics,
           practices: practices,
+          createdAt: DateTime.now(), // Используем текущую дату, если нет в БД
         );
       }).toList();
     }

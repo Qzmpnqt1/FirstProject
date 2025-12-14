@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../app/app_colors.dart';
 import '../presentation/bloc/app_cubit.dart';
 import '../presentation/bloc/app_state.dart';
 
@@ -24,7 +25,7 @@ class SchedulePage extends StatelessWidget {
           builder: (_, state) {
             final sessions = [...state.sessions]..sort((a, b) => a.scheduledAt.compareTo(b.scheduledAt));
             if (sessions.isEmpty) {
-              return const Center(child: Text('Расписание пусто. Добавьте первую учебную сессию.'));
+              return _EmptyScheduleState();
             }
             return ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -57,7 +58,7 @@ class SchedulePage extends StatelessWidget {
     );
   }
 
-  String _formatDate(BuildContext context, DateTime dateTime) {
+  static String _formatDate(BuildContext context, DateTime dateTime) {
     final l10n = MaterialLocalizations.of(context);
     final date = l10n.formatFullDate(dateTime);
     final time = l10n.formatTimeOfDay(TimeOfDay.fromDateTime(dateTime), alwaysUse24HourFormat: true);
@@ -155,4 +156,52 @@ class SchedulePage extends StatelessWidget {
     );
   }
 }
+
+class _EmptyScheduleState extends StatelessWidget {
+  const _EmptyScheduleState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.event_note_rounded,
+              size: 80,
+              color: AppColors.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Расписание пусто',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Добавьте первую учебную сессию,\nчтобы начать планирование',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            Builder(
+              builder: (context) => ElevatedButton.icon(
+                onPressed: () => SchedulePage()._openCreateDialog(context),
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Добавить сессию'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 

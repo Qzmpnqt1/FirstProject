@@ -109,13 +109,14 @@ class LocalStorageDataSource implements DataSourceInterface {
           status: ModuleStatus.notStarted,
           topics: const [TopicItemModel(title: 'Обзор материала')],
           practices: const [TopicItemModel(title: 'Мини-практика')],
+          createdAt: DateTime.now(),
         );
       }).toList();
       setModulesEx(seeded);
-      return seeded;
+      return List<ModuleModel>.from(seeded);
     }
     final defaults = [
-      const ModuleModel(
+      ModuleModel(
         id: 'm1',
         title: 'Основы Flutter и структура проекта',
         type: ModuleType.lecture,
@@ -127,8 +128,9 @@ class LocalStorageDataSource implements DataSourceInterface {
           TopicItemModel(title: 'Навигация'),
         ],
         practices: [TopicItemModel(title: 'Собрать экран профиля')],
+        createdAt: DateTime.now(),
       ),
-      const ModuleModel(
+      ModuleModel(
         id: 'm2',
         title: 'Списки и работа с состоянием',
         type: ModuleType.practice,
@@ -139,8 +141,9 @@ class LocalStorageDataSource implements DataSourceInterface {
           TopicItemModel(title: 'CRUD для модулей'),
           TopicItemModel(title: 'Dismissible карточки'),
         ],
+        createdAt: DateTime.now(),
       ),
-      const ModuleModel(
+      ModuleModel(
         id: 'm3',
         title: 'Персистентность: SharedPreferences',
         type: ModuleType.lab,
@@ -148,10 +151,11 @@ class LocalStorageDataSource implements DataSourceInterface {
         status: ModuleStatus.notStarted,
         topics: [TopicItemModel(title: 'Ключи и схемы хранения')],
         practices: [TopicItemModel(title: 'Сохранение прогресса и профиля')],
+        createdAt: DateTime.now(),
       ),
     ];
     setModulesEx(defaults);
-    return defaults;
+    return List<ModuleModel>.from(defaults);
   }
 
   @override

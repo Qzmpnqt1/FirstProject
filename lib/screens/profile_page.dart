@@ -76,10 +76,21 @@ class _ProfilePageState extends State<ProfilePage> {
               elevation: 3,
               child: Container(
                 width: 380,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFFE0FBFC), Color(0xFFFDFCFB)]),
-                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primary.withOpacity(0.05),
+                      AppColors.accent.withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.1),
+                    width: 1,
+                  ),
                 ),
                 child: BlocBuilder<AppCubit, AppState>(
                   buildWhen: (previous, current) =>
@@ -184,6 +195,37 @@ class _ProfilePageState extends State<ProfilePage> {
                                   icon: Icons.phone_rounded, title: 'Контакты', value: state.settings.contacts),
                             ],
                           ),
+                        const SizedBox(height: 24),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _StatItem(
+                                icon: Icons.school_rounded,
+                                label: 'Модули',
+                                value: context.select((AppCubit cubit) => cubit.state.modulesEx.length.toString()),
+                              ),
+                              _StatItem(
+                                icon: Icons.checklist_rounded,
+                                label: 'Задачи',
+                                value: context.select((AppCubit cubit) {
+                                  final done = cubit.state.tasks.where((t) => t.done).length;
+                                  return '$done/${cubit.state.tasks.length}';
+                                }),
+                              ),
+                              _StatItem(
+                                icon: Icons.event_rounded,
+                                label: 'Сессии',
+                                value: context.select((AppCubit cubit) => cubit.state.sessions.length.toString()),
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -238,6 +280,43 @@ class _InfoTile extends StatelessWidget {
       leading: Icon(icon, color: AppColors.primary),
       title: Text(title),
       subtitle: Text(value),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _StatItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Icon(icon, color: AppColors.primary, size: 24),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }

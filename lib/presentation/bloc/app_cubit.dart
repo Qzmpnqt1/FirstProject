@@ -155,7 +155,14 @@ class AppCubit extends Cubit<AppState> {
   }
 
   // --- Modules ---
-  Future<void> addModuleEx(String title, ModuleType type, int hours) async {
+  Future<void> addModuleEx(
+    String title,
+    ModuleType type,
+    int hours, {
+    DateTime? deadline,
+    ModulePriority priority = ModulePriority.medium,
+    String? description,
+  }) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString() + Random().nextInt(9999).toString();
     final module = ModuleEntity(
       id: id,
@@ -165,6 +172,10 @@ class AppCubit extends Cubit<AppState> {
       status: ModuleStatus.notStarted,
       topics: const [],
       practices: const [],
+      deadline: deadline,
+      priority: priority,
+      description: description,
+      createdAt: DateTime.now(),
     );
     final list = [module, ...state.modulesEx];
     await _modulesRepository.saveModules(list);
@@ -208,7 +219,10 @@ class AppCubit extends Cubit<AppState> {
       items[index] = items[index].copyWith(done: value);
       final updated = isTheory ? m.copyWith(topics: items) : m.copyWith(practices: items);
       final status = updated.progress >= 1 ? ModuleStatus.completed : ModuleStatus.inProgress;
-      return updated.copyWith(status: status);
+      return updated.copyWith(
+        status: status,
+        completedAt: updated.progress >= 1 ? DateTime.now() : null,
+      );
     }).toList();
     await _modulesRepository.saveModules(list);
     emit(state.copyWith(modulesEx: list));
@@ -223,7 +237,51 @@ class AppCubit extends Cubit<AppState> {
       final status = progress == 0
           ? ModuleStatus.notStarted
           : (progress >= 1 ? ModuleStatus.completed : ModuleStatus.inProgress);
-      return updated.copyWith(status: status);
+      return updated.copyWith(
+        status: status,
+        completedAt: progress >= 1 ? DateTime.now() : null,
+      );
+    }).toList();
+    await _modulesRepository.saveModules(list);
+    emit(state.copyWith(modulesEx: list));
+  }
+
+  Future<void> updateModuleDeadline(String id, DateTime? deadline) async {
+    final list = state.modulesEx.map((m) => m.id == id ? m.copyWith(deadline: deadline) : m).toList();
+    await _modulesRepository.saveModules(list);
+    emit(state.copyWith(modulesEx: list));
+  }
+
+  Future<void> updateModuleGrade(String id, int? grade) async {
+    final list = state.modulesEx.map((m) => m.id == id ? m.copyWith(grade: grade) : m).toList();
+    await _modulesRepository.saveModules(list);
+    emit(state.copyWith(modulesEx: list));
+  }
+
+  Future<void> updateModulePriority(String id, ModulePriority priority) async {
+    final list = state.modulesEx.map((m) => m.id == id ? m.copyWith(priority: priority) : m).toList();
+    await _modulesRepository.saveModules(list);
+    emit(state.copyWith(modulesEx: list));
+  }
+
+  Future<void> updateModuleDescription(String id, String? description) async {
+    final list = state.modulesEx.map((m) => m.id == id ? m.copyWith(description: description) : m).toList();
+    await _modulesRepository.saveModules(list);
+    emit(state.copyWith(modulesEx: list));
+  }
+
+  Future<void> updateModuleNotes(String id, String? notes) async {
+    final list = state.modulesEx.map((m) => m.id == id ? m.copyWith(notes: notes) : m).toList();
+    await _modulesRepository.saveModules(list);
+    emit(state.copyWith(modulesEx: list));
+  }
+
+  Future<void> updateTopicNotes(String moduleId, bool isTheory, int index, String? notes) async {
+    final list = state.modulesEx.map((m) {
+      if (m.id != moduleId) return m;
+      final items = [...(isTheory ? m.topics : m.practices)];
+      items[index] = items[index].copyWith(notes: notes);
+      return isTheory ? m.copyWith(topics: items) : m.copyWith(practices: items);
     }).toList();
     await _modulesRepository.saveModules(list);
     emit(state.copyWith(modulesEx: list));

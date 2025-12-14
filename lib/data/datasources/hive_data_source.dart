@@ -174,7 +174,7 @@ class HiveDataSource implements DataSourceInterface {
     final raw = _modulesExBoxInstance.get('modules_ex_list');
     if (raw == null) {
       final defaults = [
-        const ModuleModel(
+        ModuleModel(
           id: 'm1',
           title: 'Основы Flutter и структура проекта',
           type: ModuleType.lecture,
@@ -186,10 +186,11 @@ class HiveDataSource implements DataSourceInterface {
             TopicItemModel(title: 'Навигация'),
           ],
           practices: [TopicItemModel(title: 'Собрать экран профиля')],
+          createdAt: DateTime.now(),
         ),
       ];
       setModulesEx(defaults);
-      return defaults;
+      return List<ModuleModel>.from(defaults);
     }
     final list = (jsonDecode(raw as String) as List).cast<Map<String, dynamic>>();
     return list.map((e) => ModuleModel.fromJson(e)).toList();

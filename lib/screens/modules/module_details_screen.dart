@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../app/app_colors.dart';
 import '../../presentation/bloc/app_cubit.dart';
 import '../../presentation/bloc/app_state.dart';
 import '../../domain/entities/module_entity.dart';
@@ -35,10 +36,32 @@ class ModuleDetailsScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text(m.title),
             actions: [
-              IconButton(
-                tooltip: 'Переименовать',
-                onPressed: () => _rename(context, m),
-                icon: const Icon(Icons.edit_rounded),
+              PopupMenuButton(
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    child: const ListTile(
+                      leading: Icon(Icons.edit_rounded),
+                      title: Text('Переименовать'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    onTap: () => Future.delayed(
+                      const Duration(milliseconds: 100),
+                      () => _rename(context, m),
+                    ),
+                  ),
+                  PopupMenuItem(
+                    child: ListTile(
+                      leading: const Icon(Icons.flag_rounded),
+                      title: const Text('Приоритет'),
+                      subtitle: Text(_priorityName(m.priority)),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    onTap: () => Future.delayed(
+                      const Duration(milliseconds: 100),
+                      () => _editPriority(context, m),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -52,12 +75,83 @@ class ModuleDetailsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
               children: [
               Card(
-                child: ListTile(
-                  leading: CircularProgressIndicator(value: m.progress),
-                  title: Text('Прогресс: $progressPercent%'),
-                  subtitle: Text('Тип: ${_type(m.type)} • Часы: ${m.hours} • Статус: ${_status(m.status)}'),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          CircularProgressIndicator(value: m.progress),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Прогресс: $progressPercent%',
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 4),
+                                Text('Тип: ${_type(m.type)} • Часы: ${m.hours} • Статус: ${_status(m.status)}'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (m.deadline != null) ...[
+                        const Divider(),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(
+                            m.isOverdue ? Icons.warning_rounded : Icons.event_rounded,
+                            color: m.isOverdue ? Colors.red : AppColors.primary,
+                          ),
+                          title: Text(m.isOverdue ? 'Просрочен' : 'Дедлайн'),
+                          subtitle: Text(
+                            '${m.deadline!.day}.${m.deadline!.month}.${m.deadline!.year}'
+                            '${m.daysUntilDeadline >= 0 ? ' (через ${m.daysUntilDeadline} дн.)' : ''}',
+                          ),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () => _editDeadline(context, m),
+                          ),
+                        ),
+                      ],
+                      if (m.grade != null) ...[
+                        const Divider(),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.grade_rounded, color: AppColors.accent),
+                          title: Text('Оценка: ${m.grade}%'),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () => _editGrade(context, m),
+                          ),
+                        ),
+                      ],
+                      if (m.description != null && m.description!.isNotEmpty) ...[
+                        const Divider(),
+                        Text('Описание:', style: Theme.of(context).textTheme.titleSmall),
+                        const SizedBox(height: 4),
+                        Text(m.description!),
+                      ],
+                    ],
+                  ),
                 ),
               ),
+              if (m.notes != null && m.notes!.isNotEmpty)
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.note_rounded, color: AppColors.primary),
+                    title: const Text('Заметки'),
+                    subtitle: Text(m.notes!),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => _editModuleNotes(context, m),
+                    ),
+                  ),
+                ),
               _section(
                 title: 'Теория',
                 items: m.topics,
@@ -179,8 +273,179 @@ class ModuleDetailsScreen extends StatelessWidget {
       };
 
   String _status(ModuleStatus status) => switch (status) {
-        ModuleStatus.notStarted => 'не начат',
-        ModuleStatus.inProgress => 'в процессе',
-        ModuleStatus.completed => 'завершён',
-      };
+    ModuleStatus.notStarted => 'не начат',
+    ModuleStatus.inProgress => 'в процессе',
+    ModuleStatus.completed => 'завершён',
+  };
+
+  String _priorityName(ModulePriority priority) => switch (priority) {
+    ModulePriority.low => 'Низкий',
+    ModulePriority.medium => 'Средний',
+    ModulePriority.high => 'Высокий',
+    ModulePriority.urgent => 'Срочный',
+  };
+
+  void _editDeadline(BuildContext context, ModuleEntity module) {
+    DateTime? newDeadline = module.deadline;
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (_, setState) => AlertDialog(
+          title: const Text('Изменить дедлайн'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(newDeadline == null
+                    ? 'Не установлен'
+                    : '${newDeadline!.day}.${newDeadline!.month}.${newDeadline!.year}'),
+                trailing: IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: newDeadline ?? DateTime.now().add(const Duration(days: 7)),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (picked != null) {
+                      setState(() => newDeadline = picked);
+                    }
+                  },
+                ),
+              ),
+              TextButton(
+                onPressed: () => setState(() => newDeadline = null),
+                child: const Text('Удалить дедлайн'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+            ElevatedButton(
+              onPressed: () {
+                context.read<AppCubit>().updateModuleDeadline(module.id, newDeadline);
+                Navigator.pop(context);
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _editGrade(BuildContext context, ModuleEntity module) {
+    final controller = TextEditingController(text: module.grade?.toString() ?? '');
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Изменить оценку'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Оценка (0-100)',
+            helperText: 'Оставьте пустым, чтобы удалить',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          ElevatedButton(
+            onPressed: () {
+              final grade = controller.text.trim().isEmpty
+                  ? null
+                  : int.tryParse(controller.text.trim());
+              if (grade != null && (grade < 0 || grade > 100)) return;
+              context.read<AppCubit>().updateModuleGrade(module.id, grade);
+              Navigator.pop(context);
+            },
+            child: const Text('Сохранить'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editModuleNotes(BuildContext context, ModuleEntity module) {
+    final controller = TextEditingController(text: module.notes ?? '');
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Заметки к модулю'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Заметки',
+            hintText: 'Введите заметки...',
+          ),
+          maxLines: 5,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+          ElevatedButton(
+            onPressed: () {
+              context.read<AppCubit>().updateModuleNotes(
+                    module.id,
+                    controller.text.trim().isEmpty ? null : controller.text.trim(),
+                  );
+              Navigator.pop(context);
+            },
+            child: const Text('Сохранить'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editPriority(BuildContext context, ModuleEntity module) {
+    ModulePriority selectedPriority = module.priority;
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (_, setState) => AlertDialog(
+          title: const Text('Изменить приоритет'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<ModulePriority>(
+                title: const Text('Низкий'),
+                value: ModulePriority.low,
+                groupValue: selectedPriority,
+                onChanged: (v) => setState(() => selectedPriority = v!),
+              ),
+              RadioListTile<ModulePriority>(
+                title: const Text('Средний'),
+                value: ModulePriority.medium,
+                groupValue: selectedPriority,
+                onChanged: (v) => setState(() => selectedPriority = v!),
+              ),
+              RadioListTile<ModulePriority>(
+                title: const Text('Высокий'),
+                value: ModulePriority.high,
+                groupValue: selectedPriority,
+                onChanged: (v) => setState(() => selectedPriority = v!),
+              ),
+              RadioListTile<ModulePriority>(
+                title: const Text('Срочный'),
+                value: ModulePriority.urgent,
+                groupValue: selectedPriority,
+                onChanged: (v) => setState(() => selectedPriority = v!),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+            ElevatedButton(
+              onPressed: () {
+                context.read<AppCubit>().updateModulePriority(module.id, selectedPriority);
+                Navigator.pop(context);
+              },
+              child: const Text('Сохранить'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

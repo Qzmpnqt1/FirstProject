@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../app/app_colors.dart';
 import '../presentation/bloc/app_cubit.dart';
 import '../presentation/bloc/app_state.dart';
 import '../widgets/task_tile.dart';
@@ -82,28 +83,47 @@ class _TasksPageState extends State<TasksPage> {
                         ? tasks
                         : tasks.where((t) => t.title.toLowerCase().contains(query)).toList();
                     if (filtered.isEmpty) {
-                      return const Center(child: Text('Задач нет. Добавьте первую выше.'));
+                      return _EmptyState(
+                        icon: Icons.task_alt_rounded,
+                        title: query.isEmpty ? 'Нет задач' : 'Ничего не найдено',
+                        subtitle: query.isEmpty
+                            ? 'Добавьте первую задачу, чтобы начать планирование'
+                            : 'Попробуйте изменить поисковый запрос',
+                      );
                     }
                     return ListView.builder(
                       itemCount: filtered.length,
                       itemBuilder: (_, i) {
                         final task = filtered[i];
                         final sourceIndex = tasks.indexOf(task);
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: TaskTile(
-                            task: task,
-                            onToggle: (value) {
-                              if (sourceIndex != -1) {
-                                context.read<AppCubit>().toggleTask(sourceIndex, value);
-                              }
-                            },
-                            onDelete: () {
-                              if (sourceIndex != -1) {
-                                context.read<AppCubit>().deleteTask(sourceIndex);
-                              }
-                            },
-                          ),
+                        return TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: Duration(milliseconds: 300 + (i * 50)),
+                          curve: Curves.easeOut,
+                          builder: (context, value, child) {
+                            return Transform.translate(
+                              offset: Offset(20 * (1 - value), 0),
+                              child: Opacity(
+                                opacity: value,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: TaskTile(
+                                    task: task,
+                                    onToggle: (value) {
+                                      if (sourceIndex != -1) {
+                                        context.read<AppCubit>().toggleTask(sourceIndex, value);
+                                      }
+                                    },
+                                    onDelete: () {
+                                      if (sourceIndex != -1) {
+                                        context.read<AppCubit>().deleteTask(sourceIndex);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         );
                       },
                     );
@@ -122,6 +142,53 @@ class _TasksPageState extends State<TasksPage> {
     if (text.isEmpty) return;
     await context.read<AppCubit>().addTask(text);
     input.clear();
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _EmptyState({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 80,
+              color: AppColors.primary.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

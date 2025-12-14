@@ -21,18 +21,44 @@ class TaskTile extends StatelessWidget {
       secondaryBackground: _swipeBg(Alignment.centerRight),
       onDismissed: (_) => onDelete(),
       child: Card(
-        child: CheckboxListTile(
-          value: task.done,
-          onChanged: (v) => onToggle(v ?? false),
-          title: Text(
-            task.title,
-            style: TextStyle(
-              decoration: task.done ? TextDecoration.lineThrough : null,
-              color: task.done ? Colors.grey : null,
+        elevation: task.done ? 1 : 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: task.done ? AppColors.primary.withOpacity(0.05) : null,
+          ),
+          child: CheckboxListTile(
+            value: task.done,
+            onChanged: (v) => onToggle(v ?? false),
+            title: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                decoration: task.done ? TextDecoration.lineThrough : null,
+                color: task.done ? AppColors.textSecondary : AppColors.textPrimary,
+                fontSize: 16,
+              ),
+              child: Text(task.title),
+            ),
+            secondary: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: task.done
+                    ? AppColors.primary.withOpacity(0.1)
+                    : AppColors.primary.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                task.done ? Icons.check_circle_rounded : Icons.checklist_rounded,
+                color: task.done ? AppColors.primary : AppColors.primary,
+                size: 20,
+              ),
             ),
           ),
-          secondary:
-          const Icon(Icons.checklist_rounded, color: AppColors.primary),
         ),
       ),
     );

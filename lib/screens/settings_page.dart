@@ -33,12 +33,20 @@ class SettingsPage extends StatelessWidget {
           BlocSelector<AppCubit, AppState, bool>(
             selector: (state) => state.settings.themeDark,
             builder: (_, isDark) => Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: SwitchListTile(
                 value: isDark,
                 onChanged: (value) => context.read<AppCubit>().setDark(value),
-                title: const Text('Тёмная тема'),
+                title: const Text('Тёмная тема', style: TextStyle(fontWeight: FontWeight.w600)),
                 subtitle: const Text('Переключение ThemeMode для всего приложения'),
-                secondary: const Icon(Icons.dark_mode_rounded, color: AppColors.primary),
+                secondary: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.dark_mode_rounded, color: AppColors.primary, size: 20),
+                ),
               ),
             ),
           ),
@@ -72,21 +80,37 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: SwitchListTile(
               value: context.select((AppCubit cubit) => cubit.state.settings.notifications),
               onChanged: (value) => context.read<AppCubit>().setNotifications(value),
-              title: const Text('Уведомления'),
+              title: const Text('Уведомления', style: TextStyle(fontWeight: FontWeight.w600)),
               subtitle: const Text('Учебные напоминания и алерты'),
-              secondary: const Icon(Icons.notifications_active_rounded, color: AppColors.primary),
+              secondary: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.notifications_active_rounded, color: AppColors.primary, size: 20),
+              ),
             ),
           ),
           Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: SwitchListTile(
               value: context.select((AppCubit cubit) => cubit.state.settings.analytics),
               onChanged: (value) => context.read<AppCubit>().setAnalytics(value),
-              title: const Text('Аналитика'),
+              title: const Text('Аналитика', style: TextStyle(fontWeight: FontWeight.w600)),
               subtitle: const Text('Собирать обезличенную статистику'),
-              secondary: const Icon(Icons.analytics_rounded, color: AppColors.primary),
+              secondary: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.analytics_rounded, color: AppColors.primary, size: 20),
+              ),
             ),
           ),
           Card(
