@@ -117,12 +117,14 @@ class ModuleTile extends StatelessWidget {
   String _statusName(ModuleStatus s) => switch (s) {
     ModuleStatus.notStarted => 'не начат',
     ModuleStatus.inProgress => 'в процессе',
+    ModuleStatus.paused => 'на паузе',
     ModuleStatus.completed => 'завершён',
   };
 
   Color _getStatusColor(ModuleStatus s) => switch (s) {
     ModuleStatus.notStarted => Colors.grey,
     ModuleStatus.inProgress => AppColors.accent,
+    ModuleStatus.paused => Colors.orange,
     ModuleStatus.completed => Colors.green,
   };
 }

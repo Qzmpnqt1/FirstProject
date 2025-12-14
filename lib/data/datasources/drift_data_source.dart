@@ -59,10 +59,30 @@ class DriftDataSource implements DataSourceInterface {
     
     final tasks = await _db.getAllTasks();
     _tasksCache = tasks.isEmpty ? [
-      const TaskModel(title: 'Изучить виджеты Text/Button/Row/Column'),
-      const TaskModel(title: 'Сделать собственные Stateless/Stateful'),
-      const TaskModel(title: 'Смену контента по BottomBar', done: true),
-    ] : tasks.map((t) => TaskModel(title: t.title, done: t.done)).toList();
+      TaskModel(
+        id: 't1',
+        title: 'Изучить виджеты Text/Button/Row/Column',
+        createdAt: DateTime.now(),
+      ),
+      TaskModel(
+        id: 't2',
+        title: 'Сделать собственные Stateless/Stateful',
+        createdAt: DateTime.now(),
+      ),
+      TaskModel(
+        id: 't3',
+        title: 'Смену контента по BottomBar',
+        done: true,
+        createdAt: DateTime.now(),
+        completedAt: DateTime.now(),
+      ),
+    ] : tasks.map((t) => TaskModel(
+      id: t.id.toString(),
+      title: t.title,
+      done: t.done,
+      createdAt: DateTime.now(),
+      completedAt: t.done ? DateTime.now() : null,
+    )).toList();
     
     final modules = await _db.getAllModules();
     if (modules.isEmpty) {
@@ -221,9 +241,23 @@ class DriftDataSource implements DataSourceInterface {
   @override
   List<TaskModel> getTasks() {
     return _tasksCache ?? [
-      const TaskModel(title: 'Изучить виджеты Text/Button/Row/Column'),
-      const TaskModel(title: 'Сделать собственные Stateless/Stateful'),
-      const TaskModel(title: 'Смену контента по BottomBar', done: true),
+      TaskModel(
+        id: 't1',
+        title: 'Изучить виджеты Text/Button/Row/Column',
+        createdAt: DateTime.now(),
+      ),
+      TaskModel(
+        id: 't2',
+        title: 'Сделать собственные Stateless/Stateful',
+        createdAt: DateTime.now(),
+      ),
+      TaskModel(
+        id: 't3',
+        title: 'Смену контента по BottomBar',
+        done: true,
+        createdAt: DateTime.now(),
+        completedAt: DateTime.now(),
+      ),
     ];
   }
 

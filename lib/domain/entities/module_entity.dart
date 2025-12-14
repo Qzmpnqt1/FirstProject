@@ -1,6 +1,6 @@
 /// Domain entity для модуля обучения
 enum ModuleType { lecture, practice, lab }
-enum ModuleStatus { notStarted, inProgress, completed }
+enum ModuleStatus { notStarted, inProgress, paused, completed }
 enum ModulePriority { low, medium, high, urgent }
 
 class TopicItemEntity {
@@ -26,6 +26,72 @@ class TopicItemEntity {
       );
 }
 
+class ModuleStage {
+  final String id;
+  final String title;
+  final bool completed;
+  final DateTime? completedAt;
+
+  const ModuleStage({
+    required this.id,
+    required this.title,
+    this.completed = false,
+    this.completedAt,
+  });
+
+  ModuleStage copyWith({
+    String? id,
+    String? title,
+    bool? completed,
+    DateTime? completedAt,
+  }) =>
+      ModuleStage(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        completed: completed ?? this.completed,
+        completedAt: completedAt ?? this.completedAt,
+      );
+}
+
+class ModuleMaterial {
+  final String id;
+  final String title;
+  final String type; // 'link', 'file', 'note'
+  final String content; // URL, путь к файлу или текст заметки
+
+  const ModuleMaterial({
+    required this.id,
+    required this.title,
+    required this.type,
+    required this.content,
+  });
+
+  ModuleMaterial copyWith({
+    String? id,
+    String? title,
+    String? type,
+    String? content,
+  }) =>
+      ModuleMaterial(
+        id: id ?? this.id,
+        title: title ?? this.title,
+        type: type ?? this.type,
+        content: content ?? this.content,
+      );
+}
+
+class ModuleProgressEntry {
+  final DateTime date;
+  final double progress; // 0.0 - 1.0
+  final int timeSpentMinutes;
+
+  const ModuleProgressEntry({
+    required this.date,
+    required this.progress,
+    required this.timeSpentMinutes,
+  });
+}
+
 class ModuleEntity {
   final String id;
   final String title;
@@ -41,6 +107,10 @@ class ModuleEntity {
   final String? notes;
   final DateTime createdAt;
   final DateTime? completedAt;
+  final List<ModuleStage> stages; // Этапы модуля
+  final int timeSpentMinutes; // Время, потраченное на модуль
+  final List<ModuleMaterial> materials; // Прикрепленные материалы
+  final List<ModuleProgressEntry> progressHistory; // История прогресса
 
   const ModuleEntity({
     required this.id,
@@ -57,6 +127,10 @@ class ModuleEntity {
     this.notes,
     required this.createdAt,
     this.completedAt,
+    this.stages = const [],
+    this.timeSpentMinutes = 0,
+    this.materials = const [],
+    this.progressHistory = const [],
   });
 
   double get progress {
@@ -91,6 +165,10 @@ class ModuleEntity {
     String? notes,
     DateTime? createdAt,
     DateTime? completedAt,
+    List<ModuleStage>? stages,
+    int? timeSpentMinutes,
+    List<ModuleMaterial>? materials,
+    List<ModuleProgressEntry>? progressHistory,
   }) =>
       ModuleEntity(
         id: id ?? this.id,
@@ -107,6 +185,21 @@ class ModuleEntity {
         notes: notes ?? this.notes,
         createdAt: createdAt ?? this.createdAt,
         completedAt: completedAt ?? this.completedAt,
+        stages: stages ?? this.stages,
+        timeSpentMinutes: timeSpentMinutes ?? this.timeSpentMinutes,
+        materials: materials ?? this.materials,
+        progressHistory: progressHistory ?? this.progressHistory,
       );
+
+  /// Прогноз завершения модуля на основе текущего прогресса
+  DateTime? get estimatedCompletionDate {
+    if (progress <= 0 || progress >= 1) return null;
+    final daysSinceStart = DateTime.now().difference(createdAt).inDays;
+    if (daysSinceStart == 0) return null;
+    final progressPerDay = progress / daysSinceStart;
+    if (progressPerDay <= 0) return null;
+    final daysRemaining = (1 - progress) / progressPerDay;
+    return DateTime.now().add(Duration(days: daysRemaining.ceil()));
+  }
 }
 

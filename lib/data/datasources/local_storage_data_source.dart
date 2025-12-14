@@ -58,9 +58,23 @@ class LocalStorageDataSource implements DataSourceInterface {
     final raw = _prefs.getString(_kTasks);
     if (raw == null || raw.isEmpty) {
       return [
-        const TaskModel(title: 'Изучить виджеты Text/Button/Row/Column'),
-        const TaskModel(title: 'Сделать собственные Stateless/Stateful'),
-        const TaskModel(title: 'Смену контента по BottomBar', done: true),
+        TaskModel(
+          id: 't1',
+          title: 'Изучить виджеты Text/Button/Row/Column',
+          createdAt: DateTime.now(),
+        ),
+        TaskModel(
+          id: 't2',
+          title: 'Сделать собственные Stateless/Stateful',
+          createdAt: DateTime.now(),
+        ),
+        TaskModel(
+          id: 't3',
+          title: 'Смену контента по BottomBar',
+          done: true,
+          createdAt: DateTime.now(),
+          completedAt: DateTime.now(),
+        ),
       ];
     }
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();

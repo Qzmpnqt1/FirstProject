@@ -21,13 +21,18 @@ class _ModulesScreenState extends State<ModulesScreen> {
   bool _showOverdue = false;
 
   List<ModuleEntity> _filterAndSort(List<ModuleEntity> modules) {
-    var filtered = modules;
+    // Создаем изменяемую копию списка
+    var filtered = List<ModuleEntity>.from(modules);
 
     // Фильтр по статусу
     if (_filterStatus != 'all') {
       final status = _filterStatus == 'notStarted'
           ? ModuleStatus.notStarted
-          : (_filterStatus == 'inProgress' ? ModuleStatus.inProgress : ModuleStatus.completed);
+          : (_filterStatus == 'inProgress' 
+              ? ModuleStatus.inProgress 
+              : (_filterStatus == 'paused' 
+                  ? ModuleStatus.paused 
+                  : ModuleStatus.completed));
       filtered = filtered.where((m) => m.status == status).toList();
     }
 
@@ -36,10 +41,11 @@ class _ModulesScreenState extends State<ModulesScreen> {
       filtered = filtered.where((m) => m.isOverdue).toList();
     }
 
-    // Сортировка
+    // Сортировка (создаем новый список для сортировки)
+    final sorted = List<ModuleEntity>.from(filtered);
     switch (_sortBy) {
       case 'priority':
-        filtered.sort((a, b) {
+        sorted.sort((a, b) {
           final priorityOrder = {
             ModulePriority.urgent: 0,
             ModulePriority.high: 1,
@@ -50,7 +56,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
         });
         break;
       case 'deadline':
-        filtered.sort((a, b) {
+        sorted.sort((a, b) {
           if (a.deadline == null && b.deadline == null) return 0;
           if (a.deadline == null) return 1;
           if (b.deadline == null) return -1;
@@ -58,14 +64,14 @@ class _ModulesScreenState extends State<ModulesScreen> {
         });
         break;
       case 'progress':
-        filtered.sort((a, b) => b.progress.compareTo(a.progress));
+        sorted.sort((a, b) => b.progress.compareTo(a.progress));
         break;
       case 'title':
-        filtered.sort((a, b) => a.title.compareTo(b.title));
+        sorted.sort((a, b) => a.title.compareTo(b.title));
         break;
     }
 
-    return filtered;
+    return sorted;
   }
 
   @override
@@ -82,6 +88,7 @@ class _ModulesScreenState extends State<ModulesScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'modules_fab',
         onPressed: () => _createModuleDialog(context),
         icon: const Icon(Icons.add),
         label: const Text('Новый модуль'),
@@ -197,6 +204,12 @@ class _ModulesScreenState extends State<ModulesScreen> {
               RadioListTile<String>(
                 title: const Text('В процессе'),
                 value: 'inProgress',
+                groupValue: _filterStatus,
+                onChanged: (v) => setDialogState(() => _filterStatus = v!),
+              ),
+              RadioListTile<String>(
+                title: const Text('На паузе'),
+                value: 'paused',
                 groupValue: _filterStatus,
                 onChanged: (v) => setDialogState(() => _filterStatus = v!),
               ),

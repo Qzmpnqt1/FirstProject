@@ -95,7 +95,6 @@ class _TasksPageState extends State<TasksPage> {
                       itemCount: filtered.length,
                       itemBuilder: (_, i) {
                         final task = filtered[i];
-                        final sourceIndex = tasks.indexOf(task);
                         return TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0.0, end: 1.0),
                           duration: Duration(milliseconds: 300 + (i * 50)),
@@ -110,14 +109,10 @@ class _TasksPageState extends State<TasksPage> {
                                   child: TaskTile(
                                     task: task,
                                     onToggle: (value) {
-                                      if (sourceIndex != -1) {
-                                        context.read<AppCubit>().toggleTask(sourceIndex, value);
-                                      }
+                                      context.read<AppCubit>().toggleTask(task.id, value);
                                     },
                                     onDelete: () {
-                                      if (sourceIndex != -1) {
-                                        context.read<AppCubit>().deleteTask(sourceIndex);
-                                      }
+                                      context.read<AppCubit>().deleteTask(task.id);
                                     },
                                   ),
                                 ),

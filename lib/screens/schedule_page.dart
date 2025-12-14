@@ -15,6 +15,7 @@ class SchedulePage extends StatelessWidget {
         title: const Text('Учебный план по датам'),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'schedule_fab',
         onPressed: () => _openCreateDialog(context),
         icon: const Icon(Icons.event_available_rounded),
         label: const Text('Новая сессия'),

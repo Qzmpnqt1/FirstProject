@@ -66,6 +66,7 @@ class ModuleDetailsScreen extends StatelessWidget {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
+            heroTag: 'module_details_fab',
             onPressed: () => _addItem(context),
             icon: const Icon(Icons.add),
             label: const Text('Тема/практика'),
@@ -276,6 +277,8 @@ class ModuleDetailsScreen extends StatelessWidget {
     ModuleStatus.notStarted => 'не начат',
     ModuleStatus.inProgress => 'в процессе',
     ModuleStatus.completed => 'завершён',
+    // TODO: Handle this case.
+    ModuleStatus.paused => throw UnimplementedError(),
   };
 
   String _priorityName(ModulePriority priority) => switch (priority) {
